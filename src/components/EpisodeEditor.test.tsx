@@ -1,4 +1,4 @@
-import { render, screen } from "@testing-library/react";
+import { fireEvent, render, screen, waitFor } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { beforeEach, expect, test, vi } from "vitest";
 import { EpisodeEditor } from "./EpisodeEditor";
@@ -34,25 +34,49 @@ test("a new migraine gets its id up front, so a retried save can't duplicate it"
 
 test("a new migraine has no delete button", () => {
   render(<EpisodeEditor initial={null} usedTriggers={[]} usedMedications={[]} />);
-  expect(screen.queryByRole("button", { name: "Delete this migraine" })).toBeNull();
+  expect(screen.queryByRole("button", { name: /Hold to delete/ })).toBeNull();
+});
+
+const saved = {
+  id: "6f1c1c1e-0000-4000-8000-000000000001",
+  startedAt: new Date(2026, 10, 14, 9).toISOString(),
+  peakPain: 5,
+  locations: [],
+  symptoms: [],
+  triggers: [],
+  notes: "",
+  medications: [],
+};
+
+/** Press and keep holding the delete button (released only by the test ending). */
+function holdDelete() {
+  const btn = screen.getByRole("button", { name: /Hold to delete/ });
+  fireEvent.pointerDown(btn, { button: 0, pointerId: 1 });
+  return btn;
+}
+
+test("delete is hold-to-confirm: no pop-up, and a quick tap deletes nothing", async () => {
+  const confirm = vi.spyOn(window, "confirm");
+  render(<EpisodeEditor initial={saved} usedTriggers={[]} usedMedications={[]} />);
+  const btn = holdDelete();
+  fireEvent.pointerUp(btn, { button: 0, pointerId: 1 });
+  await new Promise((r) => setTimeout(r, 1500));
+  expect(deleteEpisode).not.toHaveBeenCalled();
+  expect(confirm).not.toHaveBeenCalled();
+});
+
+test("holding the button deletes and returns to History", async () => {
+  deleteEpisode.mockResolvedValue({ ok: true, id: saved.id });
+  render(<EpisodeEditor initial={saved} usedTriggers={[]} usedMedications={[]} />);
+  holdDelete();
+  await waitFor(() => expect(deleteEpisode).toHaveBeenCalledWith(saved.id), { timeout: 3000 });
+  await waitFor(() => expect(push).toHaveBeenCalledWith("/history"));
 });
 
 test("a failed delete is reported", async () => {
-  const user = userEvent.setup();
-  vi.spyOn(window, "confirm").mockReturnValue(true);
   deleteEpisode.mockResolvedValue({ ok: false, error: "Couldn't delete. Try again." });
-  const initial = {
-    id: "6f1c1c1e-0000-4000-8000-000000000001",
-    startedAt: new Date(2026, 10, 14, 9).toISOString(),
-    peakPain: 5,
-    locations: [],
-    symptoms: [],
-    triggers: [],
-    notes: "",
-    medications: [],
-  };
-  render(<EpisodeEditor initial={initial} usedTriggers={[]} usedMedications={[]} />);
-  await user.click(screen.getByRole("button", { name: "Delete this migraine" }));
-  expect(await screen.findByText("Couldn't delete. Try again.")).toBeInTheDocument();
+  render(<EpisodeEditor initial={saved} usedTriggers={[]} usedMedications={[]} />);
+  holdDelete();
+  expect(await screen.findByText("Couldn't delete. Try again.", {}, { timeout: 3000 })).toBeInTheDocument();
   expect(push).not.toHaveBeenCalled();
 });

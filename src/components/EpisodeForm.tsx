@@ -12,6 +12,7 @@ import {
 } from "@/lib/episode-form";
 import type { Episode, Helped } from "@/lib/episodes";
 import { ChipPicker } from "./ChipPicker";
+import HoldButton from "./kokonutui/hold-button";
 
 type MedDraft = { name: string; takenAt: string; helped: Helped };
 
@@ -303,21 +304,22 @@ export function EpisodeForm({ initial, usedTriggers, usedMedications, onSave, on
       </div>
 
       {onDelete && (
-        <button
-          type="button"
-          onClick={async () => {
-            setError(null);
-            try {
-              const err = await onDelete();
-              if (err) setError(err);
-            } catch {
-              setError("Couldn't delete. Check your connection, or sign in again.");
-            }
-          }}
-          className="mt-4 min-h-12 w-full text-dusk-muted underline underline-offset-4"
-        >
-          Delete this migraine
-        </button>
+        <div className="mt-6 flex justify-center">
+          {/* Press and hold to delete: a tap can't delete by accident, so no pop-up. */}
+          <HoldButton
+            className="w-full"
+            holdDuration={1200}
+            onHoldComplete={async () => {
+              setError(null);
+              try {
+                const err = await onDelete();
+                if (err) setError(err);
+              } catch {
+                setError("Couldn't delete. Check your connection, or sign in again.");
+              }
+            }}
+          />
+        </div>
       )}
     </form>
   );

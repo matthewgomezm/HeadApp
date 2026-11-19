@@ -51,7 +51,6 @@ export function EpisodeEditor({ initial, usedTriggers, usedMedications }: Props)
 
   async function onDelete(): Promise<string | null> {
     if (!episode) return null;
-    if (!window.confirm("Delete this migraine? This can't be undone.")) return null;
     const result = await deleteEpisode(episode.id);
     if (!result.ok) return result.error;
     router.push("/history");

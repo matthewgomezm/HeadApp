@@ -12,7 +12,11 @@ if (typeof window !== "undefined") {
     unobserve() {}
     disconnect() {}
   } as unknown as typeof ResizeObserver;
-  window.matchMedia ??= ((query: string) => ({
+  // Pointer capture (Kokonut hold-button, split nav scrubbing).
+  Element.prototype.hasPointerCapture ??= () => false;
+  Element.prototype.setPointerCapture ??= () => {};
+  Element.prototype.releasePointerCapture ??= () => {};
+  window.matchMedia ??=((query: string) => ({
     matches: false,
     media: query,
     onchange: null,
