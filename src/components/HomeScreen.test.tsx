@@ -24,6 +24,22 @@ describe("HomeScreen", () => {
     expect(screen.getByRole("button", { name: /I have a migraine/ })).toBeInTheDocument();
   });
 
+  test("days since counts from when the last migraine ended", () => {
+    const e: Episode = {
+      ...sampleEpisodes[0],
+      startedAt: new Date(2026, 10, 17, 23, 0),
+      endedAt: new Date(2026, 10, 18, 3, 0),
+    };
+    render(<HomeScreen name="Jadyn" episodes={[e]} now={now} />);
+    expect(screen.getByText("Your last migraine was today")).toBeInTheDocument();
+  });
+
+  test("a migraine still in progress counts as today", () => {
+    const e: Episode = { ...sampleEpisodes[0], startedAt: new Date(2026, 10, 17, 20, 0), endedAt: null };
+    render(<HomeScreen name="Jadyn" episodes={[e]} now={now} />);
+    expect(screen.getByText("Your last migraine was today")).toBeInTheDocument();
+  });
+
   test("long trigger names wrap", () => {
     const long = "a".repeat(80);
     const e: Episode = { ...sampleEpisodes[0], triggers: [long] };

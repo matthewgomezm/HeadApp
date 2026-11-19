@@ -16,7 +16,7 @@ export function HomeScreen({ name, episodes, now }: Props) {
     <main className="mx-auto max-w-md px-4 pt-[max(1rem,env(safe-area-inset-top))] pb-28">
       <p className="mt-4 text-sm text-dusk-muted">{today}</p>
       <h1 className="mt-1 text-[22px] font-semibold">Hi {name}</h1>
-      <p className="text-dusk-text/80">{daysSinceLabel(latest?.startedAt ?? null, now)}</p>
+      <p className="text-dusk-text/80">{daysSinceLabel(latest ? (latest.endedAt ?? now) : null, now)}</p>
 
       <div className="mt-10 mb-4">
         <LogButton />
