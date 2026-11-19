@@ -43,15 +43,65 @@ test("renders all sections", () => {
   }
 });
 
-test("tapping a trigger chip includes it on save", async () => {
+test("triggers: pick from the combobox list, and it's saved", async () => {
   const user = userEvent.setup();
   const onSave = vi.fn().mockResolvedValue({ ok: true, id: initial.id });
   render(<EpisodeForm initial={initial} usedTriggers={[]} usedMedications={[]} onSave={onSave} />);
-  await user.click(screen.getByRole("button", { name: "stress" }));
+  const input = screen.getByRole("combobox", { name: "Possible triggers" });
+  await user.click(input);
+  await user.type(input, "stre");
+  await user.click(await screen.findByRole("option", { name: "stress" }));
   await user.click(screen.getByRole("button", { name: "Save" }));
   expect(onSave).toHaveBeenCalledTimes(1);
-  expect(onSave.mock.calls[0][0].triggers).toContain("stress");
+  expect(onSave.mock.calls[0][0].triggers).toEqual(["stress"]);
   expect(onSave.mock.calls[0][0].id).toBe(initial.id);
+});
+
+test("triggers: type something new and add it", async () => {
+  const user = userEvent.setup();
+  const onSave = vi.fn().mockResolvedValue({ ok: true, id: initial.id });
+  render(<EpisodeForm initial={initial} usedTriggers={[]} usedMedications={[]} onSave={onSave} />);
+  const input = screen.getByRole("combobox", { name: "Possible triggers" });
+  await user.click(input);
+  await user.type(input, "red wine");
+  await user.click(await screen.findByRole("option", { name: 'Add "red wine"' }));
+  await user.click(screen.getByRole("button", { name: "Save" }));
+  expect(onSave.mock.calls[0][0].triggers).toEqual(["red wine"]);
+});
+
+test("where: selected places show as chips and can be removed", async () => {
+  const user = userEvent.setup();
+  const onSave = vi.fn().mockResolvedValue({ ok: true, id: initial.id });
+  render(
+    <EpisodeForm
+      initial={{ ...initial, locations: ["left side", "forehead"] }}
+      usedTriggers={[]}
+      usedMedications={[]}
+      onSave={onSave}
+    />,
+  );
+  const where = screen.getByRole("combobox", { name: "Where" }).closest('[data-slot="combobox-chips"]') as HTMLElement;
+  expect(where).toHaveTextContent("left side");
+  expect(where).toHaveTextContent("forehead");
+  await user.click(screen.getByRole("button", { name: "Remove left side" }));
+  await user.click(screen.getByRole("button", { name: "Save" }));
+  expect(onSave.mock.calls[0][0].locations).toEqual(["forehead"]);
+});
+
+test("symptoms use the combobox too, and aura is not offered", async () => {
+  const user = userEvent.setup();
+  render(<EpisodeForm initial={initial} usedTriggers={[]} usedMedications={[]} onSave={vi.fn()} />);
+  const input = screen.getByRole("combobox", { name: "Symptoms" });
+  await user.click(input);
+  expect(await screen.findByRole("option", { name: "nausea" })).toBeInTheDocument();
+  expect(screen.queryByRole("option", { name: "aura" })).toBeNull();
+});
+
+test("combobox inputs are 16px (no iOS zoom)", () => {
+  render(<EpisodeForm initial={initial} usedTriggers={[]} usedMedications={[]} onSave={vi.fn()} />);
+  for (const name of ["Where", "Symptoms", "Possible triggers"]) {
+    expect(screen.getByRole("combobox", { name })).toHaveClass("text-base");
+  }
 });
 
 test("used medications appear as chips and can be added", async () => {

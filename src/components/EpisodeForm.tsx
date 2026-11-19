@@ -11,7 +11,7 @@ import {
   type SaveResult,
 } from "@/lib/episode-form";
 import type { Episode, Helped } from "@/lib/episodes";
-import { ChipPicker } from "./ChipPicker";
+import { MultiPicker } from "./MultiPicker";
 import HoldButton from "./kokonutui/hold-button";
 
 type MedDraft = { name: string; takenAt: string; helped: Helped };
@@ -46,7 +46,6 @@ function Section({ title, children }: { title: string; children: ReactNode }) {
   );
 }
 
-const toggle = (xs: string[], x: string) => (xs.includes(x) ? xs.filter((y) => y !== x) : [...xs, x]);
 const union = (...lists: readonly (readonly string[])[]) => [...new Set(lists.flat())];
 
 export function EpisodeForm({ initial, usedTriggers, usedMedications, onSave, onDelete }: Props) {
@@ -57,7 +56,6 @@ export function EpisodeForm({ initial, usedTriggers, usedMedications, onSave, on
   const [locations, setLocations] = useState(initial.locations);
   const [symptoms, setSymptoms] = useState(initial.symptoms);
   const [triggers, setTriggers] = useState(initial.triggers);
-  const [customTrigger, setCustomTrigger] = useState("");
   const [meds, setMeds] = useState<MedDraft[]>(
     initial.medications.map((m) => ({
       name: m.name,
@@ -77,12 +75,6 @@ export function EpisodeForm({ initial, usedTriggers, usedMedications, onSave, on
     const n = name.trim();
     if (!n || meds.some((m) => m.name.toLowerCase() === n.toLowerCase())) return;
     setMeds([...meds, { name: n, takenAt: "", helped: "unknown" }]);
-  }
-
-  function addTrigger() {
-    const t = customTrigger.trim();
-    if (t && !triggers.includes(t)) setTriggers([...triggers, t]);
-    setCustomTrigger("");
   }
 
   function updateMed(i: number, patch: Partial<MedDraft>) {
@@ -177,18 +169,16 @@ export function EpisodeForm({ initial, usedTriggers, usedMedications, onSave, on
       </Section>
 
       <Section title="Where">
-        <ChipPicker
-          options={LOCATIONS}
-          selected={locations}
-          onToggle={(v) => setLocations(toggle(locations, v))}
-        />
+        <MultiPicker label="Where" options={LOCATIONS} value={locations} onChange={setLocations} />
       </Section>
 
       <Section title="Symptoms">
-        <ChipPicker
-          options={union(SYMPTOMS, symptoms)}
-          selected={symptoms}
-          onToggle={(v) => setSymptoms(toggle(symptoms, v))}
+        <MultiPicker
+          label="Symptoms"
+          options={SYMPTOMS}
+          value={symptoms}
+          onChange={setSymptoms}
+          allowCustom
         />
       </Section>
 
@@ -274,30 +264,14 @@ export function EpisodeForm({ initial, usedTriggers, usedMedications, onSave, on
       </Section>
 
       <Section title="Possible triggers">
-        <ChipPicker
+        <MultiPicker
+          label="Possible triggers"
           options={triggerOptions}
-          selected={triggers}
-          onToggle={(v) => setTriggers(toggle(triggers, v))}
+          value={triggers}
+          onChange={setTriggers}
+          allowCustom
+          placeholder="Tap to choose, or type your own"
         />
-        <div className="mt-3 flex gap-2">
-          <input
-            aria-label="Your own trigger"
-            placeholder="Add your own"
-            value={customTrigger}
-            maxLength={60}
-            onChange={(e) => setCustomTrigger(e.target.value)}
-            onKeyDown={(e) => {
-              if (e.key === "Enter") {
-                e.preventDefault();
-                addTrigger();
-              }
-            }}
-            className={`${field} mt-0`}
-          />
-          <button type="button" onClick={addTrigger} className={smallBtn}>
-            Add
-          </button>
-        </div>
       </Section>
 
       <Section title="Notes">
