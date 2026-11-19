@@ -68,3 +68,18 @@ export async function deleteEpisode(id: string): Promise<SaveResult> {
   revalidatePath("/history");
   return { ok: true, id };
 }
+
+/** Delete several migraines at once (History → Select). RLS limits it to her own rows. */
+export async function deleteEpisodes(
+  ids: string[],
+): Promise<{ ok: true; count: number } | { ok: false; error: string }> {
+  const parsed = z.array(z.uuid()).max(1000).safeParse(ids);
+  if (!parsed.success) return { ok: false, error: "Couldn't delete. Try again." };
+  if (parsed.data.length === 0) return { ok: true, count: 0 };
+  const supabase = await createClient();
+  const { error } = await supabase.from("episodes").delete().in("id", parsed.data);
+  if (error) return { ok: false, error: "Couldn't delete. Try again." };
+  revalidatePath("/");
+  revalidatePath("/history");
+  return { ok: true, count: parsed.data.length };
+}
