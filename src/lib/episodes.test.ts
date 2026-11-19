@@ -17,8 +17,11 @@ function ep(overrides: Partial<Episode> = {}): Episode {
     startedAt: start,
     endedAt: plus(start, 380),
     peakPain: 7,
+    locations: [],
+    symptoms: [],
     triggers: [],
-    medications: [{ name: "Sumatriptan", helped: "yes" }],
+    notes: "",
+    medications: [{ name: "Sumatriptan", takenAt: null, helped: "yes" }],
     ...overrides,
   };
 }
@@ -60,15 +63,15 @@ describe("episodeSubline", () => {
   test("medication helped", () => expect(episodeSubline(ep())).toBe("6h 20m · Sumatriptan helped"));
   test("no medications", () => expect(episodeSubline(ep({ medications: [] }))).toBe("6h 20m"));
   test("medication didn't help", () =>
-    expect(episodeSubline(ep({ medications: [{ name: "Sumatriptan", helped: "no" }] }))).toBe(
+    expect(episodeSubline(ep({ medications: [{ name: "Sumatriptan", takenAt: null, helped: "no" }] }))).toBe(
       "6h 20m · Sumatriptan didn't help",
     ));
   test("helped a little", () =>
-    expect(episodeSubline(ep({ medications: [{ name: "Advil", helped: "somewhat" }] }))).toBe(
+    expect(episodeSubline(ep({ medications: [{ name: "Advil", takenAt: null, helped: "somewhat" }] }))).toBe(
       "6h 20m · Advil helped a little",
     ));
   test("unknown → name only", () =>
-    expect(episodeSubline(ep({ medications: [{ name: "Advil", helped: "unknown" }] }))).toBe(
+    expect(episodeSubline(ep({ medications: [{ name: "Advil", takenAt: null, helped: "unknown" }] }))).toBe(
       "6h 20m · Advil",
     ));
   test("in progress", () =>

@@ -1,12 +1,19 @@
 export type Helped = "yes" | "somewhat" | "no" | "unknown";
 
+export const HELPED_VALUES: readonly Helped[] = ["yes", "somewhat", "no", "unknown"];
+
+export type Medication = { id?: string; name: string; takenAt: Date | null; helped: Helped };
+
 export type Episode = {
   id: string;
   startedAt: Date;
   endedAt: Date | null;
   peakPain: number | null;
+  locations: string[];
+  symptoms: string[];
   triggers: string[];
-  medications: { name: string; helped: Helped }[];
+  notes: string;
+  medications: Medication[];
 };
 
 const DAY_MS = 86_400_000;
