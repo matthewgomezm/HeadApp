@@ -1,27 +1,6 @@
 import { beforeEach, describe, expect, test, vi } from "vitest";
+import { MemStorage } from "@/test/mem-storage";
 import { enqueue, flush, localOpenEpisode, pending } from "./log-queue";
-
-class MemStorage implements Storage {
-  private m = new Map<string, string>();
-  get length() {
-    return this.m.size;
-  }
-  clear() {
-    this.m.clear();
-  }
-  getItem(k: string) {
-    return this.m.get(k) ?? null;
-  }
-  key(i: number) {
-    return [...this.m.keys()][i] ?? null;
-  }
-  removeItem(k: string) {
-    this.m.delete(k);
-  }
-  setItem(k: string, v: string) {
-    this.m.set(k, v);
-  }
-}
 
 let s: MemStorage;
 beforeEach(() => {

@@ -40,6 +40,21 @@ describe("HomeScreen", () => {
     expect(screen.getByText("Your last migraine was today")).toBeInTheDocument();
   });
 
+  test("in-progress state replaces the big button", () => {
+    render(
+      <HomeScreen
+        name="Jadyn"
+        episodes={sampleEpisodes}
+        now={now}
+        openEpisode={{ id: "abc", startedAt: new Date(2026, 10, 18, 9, 5) }}
+      />,
+    );
+    expect(screen.getByText(/Migraine in progress since/)).toBeInTheDocument();
+    expect(screen.getByRole("button", { name: "It's over" })).toBeInTheDocument();
+    expect(screen.getByRole("link", { name: "Add details" })).toHaveAttribute("href", "/episodes/abc");
+    expect(screen.queryByRole("button", { name: /I have a migraine/ })).toBeNull();
+  });
+
   test("long trigger names wrap", () => {
     const long = "a".repeat(80);
     const e: Episode = { ...sampleEpisodes[0], triggers: [long] };

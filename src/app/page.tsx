@@ -1,6 +1,8 @@
-import { ClientHome } from "@/components/ClientHome";
-import { sampleEpisodes } from "@/lib/sample-data";
+import { LiveHome } from "@/components/LiveHome";
+import { getEpisodes } from "@/lib/data";
+import { serializeEpisode } from "@/lib/episode-rows";
 
-export default function Home() {
-  return <ClientHome name="Jadyn" episodes={sampleEpisodes} />;
+export default async function Home() {
+  const episodes = await getEpisodes(20);
+  return <LiveHome name="Jadyn" initial={episodes.map(serializeEpisode)} />;
 }
