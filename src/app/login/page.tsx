@@ -1,6 +1,7 @@
 "use client";
 
 import { useRouter } from "next/navigation";
+import { PersonIcon } from "@/components/icons/PersonIcon";
 import { LoginForm } from "@/components/LoginForm";
 import { createClient } from "@/lib/supabase/client";
 
@@ -20,9 +21,11 @@ export default function LoginPage() {
   }
 
   return (
-    <main className="mx-auto max-w-md px-4 pt-[max(2rem,env(safe-area-inset-top))]">
-      <h1 className="mt-10 text-[22px] font-semibold">Migraine Tracker</h1>
-      <p className="mt-1 mb-8 text-dusk-muted">Sign in once and you&apos;ll stay signed in.</p>
+    <main className="flex min-h-svh flex-col items-center justify-center px-4 pt-[env(safe-area-inset-top)] pb-[env(safe-area-inset-bottom)]">
+      <div className="mb-3 flex size-16 items-center justify-center rounded-2xl border border-dusk-fill bg-dusk-surface">
+        <PersonIcon data-testid="login-icon" aria-hidden="true" className="size-10 text-dusk-accent" />
+      </div>
+      <h1 className="mb-6 text-[22px] font-semibold text-dusk-text">Migraine Tracker</h1>
       <LoginForm onSignIn={signIn} />
     </main>
   );

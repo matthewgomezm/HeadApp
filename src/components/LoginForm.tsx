@@ -1,14 +1,20 @@
 "use client";
 
 import { useState, type FormEvent } from "react";
+import { Button } from "@/components/ui/button";
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { Field, FieldGroup, FieldLabel } from "@/components/ui/field";
+import { Input } from "@/components/ui/input";
 
 type Props = {
   /** Resolve to an error message, or null on success. */
   onSignIn: (email: string, password: string) => Promise<string | null>;
 };
 
-const input =
-  "mt-1 block w-full rounded-xl bg-dusk-surface px-4 py-3 text-base text-dusk-text placeholder:text-dusk-muted outline-none focus-visible:ring-2 focus-visible:ring-dusk-accent";
+// Based on shadcn's login-01 card. Left out on purpose: "Login with Google"
+// (not set up), "Sign up" (sign-ups are off) and "Forgot password" (needs
+// email, which isn't configured) — each would be a dead end for her.
+const inputClass = "h-12 rounded-xl border-dusk-fill bg-dusk-bg px-4 text-base text-dusk-text";
 
 export function LoginForm({ onSignIn }: Props) {
   const [email, setEmail] = useState("");
@@ -26,41 +32,61 @@ export function LoginForm({ onSignIn }: Props) {
   }
 
   return (
-    <form onSubmit={submit} className="mx-auto max-w-sm">
-      <label className="block">
-        <span className="text-sm text-dusk-muted">Email</span>
-        <input
-          type="email"
-          autoComplete="email"
-          required
-          value={email}
-          onChange={(e) => setEmail(e.target.value)}
-          className={input}
-        />
-      </label>
-      <label className="mt-4 block">
-        <span className="text-sm text-dusk-muted">Password</span>
-        <input
-          type="password"
-          autoComplete="current-password"
-          required
-          value={password}
-          onChange={(e) => setPassword(e.target.value)}
-          className={input}
-        />
-      </label>
-      <button
-        type="submit"
-        disabled={busy || email.trim() === "" || password === ""}
-        className="mt-6 min-h-12 w-full rounded-xl bg-dusk-fill px-4 py-3 font-semibold text-dusk-accent disabled:opacity-50 focus-visible:outline-2 focus-visible:outline-dusk-accent"
-      >
-        Sign in
-      </button>
-      {error && (
-        <p role="alert" className="mt-4 text-dusk-accent">
-          {error}
-        </p>
-      )}
-    </form>
+    <Card className="mx-auto w-full max-w-sm rounded-2xl border border-dusk-fill bg-dusk-surface ring-0">
+      <CardHeader>
+        <CardTitle className="text-lg font-semibold text-dusk-text">Sign in to your account</CardTitle>
+        <CardDescription className="text-dusk-muted">
+          Sign in once and you&apos;ll stay signed in.
+        </CardDescription>
+      </CardHeader>
+      <CardContent>
+        <form onSubmit={submit}>
+          <FieldGroup>
+            <Field>
+              <FieldLabel htmlFor="email" className="text-dusk-muted">
+                Email
+              </FieldLabel>
+              <Input
+                id="email"
+                type="email"
+                autoComplete="email"
+                required
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                className={inputClass}
+              />
+            </Field>
+            <Field>
+              <FieldLabel htmlFor="password" className="text-dusk-muted">
+                Password
+              </FieldLabel>
+              <Input
+                id="password"
+                type="password"
+                autoComplete="current-password"
+                required
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+                className={inputClass}
+              />
+            </Field>
+            {error && (
+              <p role="alert" className="text-destructive">
+                {error}
+              </p>
+            )}
+            <Field>
+              <Button
+                type="submit"
+                disabled={busy || email.trim() === "" || password === ""}
+                className="h-12 rounded-xl text-base font-semibold"
+              >
+                Sign in
+              </Button>
+            </Field>
+          </FieldGroup>
+        </form>
+      </CardContent>
+    </Card>
   );
 }
