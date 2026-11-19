@@ -1,5 +1,5 @@
 import { describe, expect, test } from "vitest";
-import { episodeInputSchema, fromLocalInputValue, toLocalInputValue } from "./episode-form";
+import { episodeInputSchema, fromLocalInputValue, SYMPTOMS, toLocalInputValue } from "./episode-form";
 
 const NOW = new Date("2026-11-18T18:00:00Z");
 
@@ -47,6 +47,20 @@ describe("episodeInputSchema", () => {
     expect(parse(input({ medications: [{ name: "  ", takenAt: null, helped: "yes" }] })).success).toBe(false));
 
   test("rejects a bad id", () => expect(parse(input({ id: "not-a-uuid" })).success).toBe(false));
+});
+
+describe("symptom options", () => {
+  test("aura is not offered", () => {
+    expect(SYMPTOMS).not.toContain("aura");
+    expect(SYMPTOMS).toEqual([
+      "nausea",
+      "vomiting",
+      "light sensitivity",
+      "sound sensitivity",
+      "smell sensitivity",
+      "dizziness",
+    ]);
+  });
 });
 
 describe("datetime-local helpers", () => {

@@ -94,7 +94,7 @@ than features.
   tap is ignored while the pain screen is opening.
 - **Stage 2, later (episode detail):** editable start time, peak pain,
   location (left / right / both / behind eyes / back of head / forehead),
-  symptoms (aura, nausea, vomiting, light sensitivity, sound sensitivity,
+  symptoms (nausea, vomiting, light sensitivity, sound sensitivity,
   smell sensitivity, dizziness), medications (name, time, helped:
   yes / somewhat / no), suspected triggers (checklist), free-text notes.
 - Starting trigger checklist: poor sleep, stress, skipped meal, dehydration,

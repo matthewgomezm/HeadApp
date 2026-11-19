@@ -26,7 +26,6 @@ export const LOCATIONS = [
 ] as const;
 
 export const SYMPTOMS = [
-  "aura",
   "nausea",
   "vomiting",
   "light sensitivity",
