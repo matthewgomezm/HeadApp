@@ -1,5 +1,6 @@
 import type { Metadata, Viewport } from "next";
-import { TabBar } from "@/components/TabBar";
+import { Suspense } from "react";
+import { TabBar, TabBarView } from "@/components/TabBar";
 import { dusk } from "@/lib/theme";
 import "./globals.css";
 
@@ -25,7 +26,9 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
     <html lang="en" className="h-full">
       <body className="min-h-full bg-dusk-bg font-sans text-dusk-text antialiased">
         {children}
-        <TabBar />
+        <Suspense fallback={<TabBarView pathname={null} />}>
+          <TabBar />
+        </Suspense>
       </body>
     </html>
   );

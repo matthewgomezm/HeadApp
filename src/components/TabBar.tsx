@@ -11,8 +11,14 @@ const TABS = [
 ] as const;
 
 export function TabBar() {
-  const pathname = usePathname();
-  if (pathname.startsWith("/login")) return null;
+  return <TabBarView pathname={usePathname()} />;
+}
+
+/** Pure view; `pathname: null` (Suspense fallback) renders with no active tab. */
+export function TabBarView({ pathname }: { pathname: string | null }) {
+  if (pathname?.startsWith("/login")) return null;
+  // Episode detail/new pages belong to History.
+  const current = pathname?.startsWith("/episodes") ? "/history" : pathname;
   return (
     <nav
       aria-label="Main"
@@ -20,7 +26,7 @@ export function TabBar() {
     >
       <ul className="mx-auto flex max-w-md justify-around">
         {TABS.map(({ href, label }) => {
-          const active = pathname === href;
+          const active = current === href;
           return (
             <li key={href} className="flex-1">
               <Link

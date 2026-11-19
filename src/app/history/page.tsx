@@ -1,8 +1,20 @@
-export default function HistoryPage() {
+import Link from "next/link";
+import { HistoryList } from "@/components/HistoryList";
+import { getEpisodes } from "@/lib/data";
+import { serializeEpisode } from "@/lib/episode-rows";
+
+export default async function HistoryPage() {
+  const episodes = await getEpisodes();
   return (
     <main className="mx-auto max-w-md px-4 pt-[max(1rem,env(safe-area-inset-top))] pb-28">
       <h1 className="mt-4 text-[22px] font-semibold">History</h1>
-      <p className="mt-2 text-dusk-muted">Coming soon</p>
+      <Link
+        href="/episodes/new"
+        className="mt-4 flex min-h-12 items-center justify-center rounded-xl bg-dusk-fill font-semibold text-dusk-accent focus-visible:outline-2 focus-visible:outline-dusk-accent"
+      >
+        Log a past migraine
+      </Link>
+      <HistoryList initial={episodes.map(serializeEpisode)} />
     </main>
   );
 }
