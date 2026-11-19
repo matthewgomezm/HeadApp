@@ -53,8 +53,16 @@ export function LiveHome({ name, initial, upsert: injected, storage }: Props) {
   useEffect(() => {
     void sync();
     const onOnline = () => void sync();
+    // iOS resumes a home-screen app from the background instead of reloading it.
+    const onVisible = () => {
+      if (document.visibilityState === "visible") void sync();
+    };
     window.addEventListener("online", onOnline);
-    return () => window.removeEventListener("online", onOnline);
+    document.addEventListener("visibilitychange", onVisible);
+    return () => {
+      window.removeEventListener("online", onOnline);
+      document.removeEventListener("visibilitychange", onVisible);
+    };
   }, [sync]);
 
   // version is read so the list recomputes after enqueue

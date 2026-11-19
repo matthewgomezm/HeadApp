@@ -50,7 +50,7 @@ const isoDate = z.iso.datetime({ offset: true });
 export function episodeInputSchema(now: Date = new Date()) {
   return z
     .object({
-      id: z.uuid().optional(),
+      id: z.uuid(),
       startedAt: isoDate,
       peakPain: z.int().min(1).max(10).nullable(),
       locations: labelList,

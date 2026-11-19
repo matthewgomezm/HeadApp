@@ -5,6 +5,7 @@ const NOW = new Date("2026-11-18T18:00:00Z");
 
 function input(overrides: Record<string, unknown> = {}) {
   return {
+    id: "6f1c1c1e-0000-4000-8000-000000000001",
     startedAt: "2026-11-14T17:00:00.000Z",
     peakPain: 7,
     locations: ["left side"],

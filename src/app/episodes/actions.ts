@@ -1,6 +1,7 @@
 "use server";
 
 import { revalidatePath } from "next/cache";
+import { z } from "zod";
 import { episodeInputSchema, type SaveResult } from "@/lib/episode-form";
 import { createClient } from "@/lib/supabase/server";
 
@@ -22,14 +23,19 @@ export async function saveEpisode(raw: unknown): Promise<SaveResult> {
     notes: v.notes,
   };
 
-  const { data: saved, error } = v.id
-    ? await supabase.from("episodes").upsert({ id: v.id, ...row }, { onConflict: "id" }).select("id").single()
-    : await supabase.from("episodes").insert(row).select("id").single();
+  // Upsert by the id the device assigned, so a retried save never duplicates.
+  const { data: saved, error } = await supabase
+    .from("episodes")
+    .upsert({ id: v.id, ...row }, { onConflict: "id" })
+    .select("id")
+    .single();
   if (error || !saved) return { ok: false, error: "Couldn't save. Check your connection and try again." };
 
-  // Replace this episode's medications.
-  const del = await supabase.from("medication_doses").delete().eq("episode_id", saved.id);
-  if (del.error) return { ok: false, error: "Couldn't save medications. Try again." };
+  // Replace medications without a window where they're lost: remember the old
+  // rows, insert the new list, and only then delete the old rows. If the insert
+  // fails, the old list is untouched; if the delete fails, the next save cleans up.
+  const old = await supabase.from("medication_doses").select("id").eq("episode_id", saved.id);
+  if (old.error) return { ok: false, error: "Couldn't save medications. Try again." };
   if (v.medications.length > 0) {
     const ins = await supabase.from("medication_doses").insert(
       v.medications.map((m) => ({
@@ -41,6 +47,11 @@ export async function saveEpisode(raw: unknown): Promise<SaveResult> {
     );
     if (ins.error) return { ok: false, error: "Couldn't save medications. Try again." };
   }
+  const oldIds = old.data.map((d) => d.id);
+  if (oldIds.length > 0) {
+    const del = await supabase.from("medication_doses").delete().in("id", oldIds);
+    if (del.error) return { ok: false, error: "Saved, but couldn't tidy old medications. Save again." };
+  }
 
   revalidatePath("/");
   revalidatePath("/history");
@@ -48,6 +59,7 @@ export async function saveEpisode(raw: unknown): Promise<SaveResult> {
 }
 
 export async function deleteEpisode(id: string): Promise<SaveResult> {
+  if (!z.uuid().safeParse(id).success) return { ok: false, error: "Couldn't delete. Try again." };
   const supabase = await createClient();
   const { error } = await supabase.from("episodes").delete().eq("id", id);
   if (error) return { ok: false, error: "Couldn't delete. Try again." };

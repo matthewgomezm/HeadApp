@@ -6,7 +6,8 @@ import { MemStorage } from "@/test/mem-storage";
 import { LiveHome } from "./LiveHome";
 
 const refresh = vi.fn();
-vi.mock("next/navigation", () => ({ useRouter: () => ({ refresh }) }));
+const router = { refresh }; // stable, like the real Next router
+vi.mock("next/navigation", () => ({ useRouter: () => router }));
 
 let storage: MemStorage;
 beforeEach(() => {
@@ -37,6 +38,20 @@ test("tap → pain sheet → pick 7 → upserted with pain", async () => {
   expect(typeof last.id).toBe("string");
   expect(pending(storage)).toEqual([]);
   expect(refresh).toHaveBeenCalled();
+});
+
+test("returning to the app retries sending queued taps", async () => {
+  enqueue({ id: "q1", patch: { started_at: new Date().toISOString() } }, storage);
+  const upsert = vi.fn().mockResolvedValue({ error: new Error("offline") });
+  render(<LiveHome name="Jadyn" initial={[]} upsert={upsert} storage={storage} />);
+  await act(async () => {});
+  const before = upsert.mock.calls.length;
+  upsert.mockResolvedValue({ error: null });
+  await act(async () => {
+    document.dispatchEvent(new Event("visibilitychange"));
+  });
+  expect(upsert.mock.calls.length).toBeGreaterThan(before);
+  expect(pending(storage)).toEqual([]);
 });
 
 test("an unsynced tap shows as today's migraine after reload", () => {

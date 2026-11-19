@@ -21,7 +21,8 @@ type Props = {
   usedTriggers: string[];
   usedMedications: string[];
   onSave: (input: EpisodeInput) => Promise<SaveResult>;
-  onDelete?: () => void;
+  /** Resolves to an error message, or null. */
+  onDelete?: () => Promise<string | null>;
 };
 
 const field =
@@ -89,7 +90,7 @@ export function EpisodeForm({ initial, usedTriggers, usedMedications, onSave, on
     setSaving(true);
     setError(null);
     const input: EpisodeInput = {
-      ...(initial.id ? { id: initial.id } : {}),
+      id: initial.id,
       startedAt: fromLocalInputValue(start).toISOString(),
       peakPain: pain,
       locations,
@@ -102,9 +103,14 @@ export function EpisodeForm({ initial, usedTriggers, usedMedications, onSave, on
         helped: m.helped,
       })),
     };
-    const result = await onSave(input);
-    setSaving(false);
-    if (!result.ok) setError(result.error);
+    try {
+      const result = await onSave(input);
+      if (!result.ok) setError(result.error);
+    } catch {
+      setError("Couldn't save. Check your connection, or sign in again.");
+    } finally {
+      setSaving(false);
+    }
   }
 
   return (
@@ -299,7 +305,15 @@ export function EpisodeForm({ initial, usedTriggers, usedMedications, onSave, on
       {onDelete && (
         <button
           type="button"
-          onClick={onDelete}
+          onClick={async () => {
+            setError(null);
+            try {
+              const err = await onDelete();
+              if (err) setError(err);
+            } catch {
+              setError("Couldn't delete. Check your connection, or sign in again.");
+            }
+          }}
           className="mt-4 min-h-12 w-full text-dusk-muted underline underline-offset-4"
         >
           Delete this migraine

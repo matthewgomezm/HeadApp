@@ -53,6 +53,17 @@ test("used medications appear as chips and can be added", async () => {
   ]);
 });
 
+test("a save that throws (offline / signed out) shows an error and re-enables Save", async () => {
+  const user = userEvent.setup();
+  const onSave = vi.fn().mockRejectedValue(new TypeError("Failed to fetch"));
+  render(<EpisodeForm initial={initial} usedTriggers={[]} usedMedications={[]} onSave={onSave} />);
+  await user.click(screen.getByRole("button", { name: "Save" }));
+  expect(
+    await screen.findByText("Couldn't save. Check your connection, or sign in again."),
+  ).toBeInTheDocument();
+  expect(screen.getByRole("button", { name: "Save" })).toBeEnabled();
+});
+
 test("shows the save error", async () => {
   const user = userEvent.setup();
   const onSave = vi.fn().mockResolvedValue({ ok: false, error: "Start time can't be in the future" });
