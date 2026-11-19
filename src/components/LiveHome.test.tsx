@@ -1,4 +1,4 @@
-import { act, fireEvent, render, screen } from "@testing-library/react";
+import { act, fireEvent, render, screen, waitFor } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { beforeEach, expect, test, vi } from "vitest";
 import { enqueue, pending } from "@/lib/log-queue";
@@ -88,6 +88,26 @@ test("double-tapping It's over ends it without starting a new migraine", async (
   });
   expect(pending(storage)).toHaveLength(1);
   expect(screen.queryByRole("heading", { name: "How bad is it?" })).toBeNull();
+});
+
+test("after starting, a 'Logged' confirmation shows briefly, then goes away", async () => {
+  const user = userEvent.setup();
+  const upsert = vi.fn().mockResolvedValue({ error: new Error("offline") });
+  render(<LiveHome name="Jadyn" initial={[]} upsert={upsert} storage={storage} />);
+  await user.click(screen.getByRole("button", { name: /I have a migraine/ }));
+  await user.click(screen.getByRole("button", { name: "Skip" }));
+  const status = screen.getByRole("status");
+  expect(status).toHaveTextContent(/^Logged \d{1,2}:\d{2} [AP]M$/);
+  await waitFor(() => expect(screen.queryByRole("status")).toBeNull(), { timeout: 3000 });
+});
+
+test("after ending, the confirmation shows the duration", async () => {
+  const user = userEvent.setup();
+  const upsert = vi.fn().mockResolvedValue({ error: new Error("offline") });
+  enqueue({ id: "q1", patch: { started_at: new Date(Date.now() - 65 * 60_000).toISOString() } }, storage);
+  render(<LiveHome name="Jadyn" initial={[]} upsert={upsert} storage={storage} />);
+  await user.click(screen.getByRole("button", { name: /It's over/ }));
+  expect(screen.getByRole("status")).toHaveTextContent("Ended · 1h 5m");
 });
 
 test("ending a migraine that is already saved sends just the end time", async () => {

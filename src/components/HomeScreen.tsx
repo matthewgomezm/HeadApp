@@ -10,6 +10,7 @@ import { METRIC_SEGMENTS, migraineMetricData } from "@/lib/migraine-metrics";
 import { EpisodeCard } from "./EpisodeCard";
 import { Card, CardDescription, CardHeader, CardTitle } from "./ui/card";
 import MetricCard from "./kokonutui/metric-card";
+import { LoggedCheck } from "./LoggedCheck";
 import { LogButton } from "./LogButton";
 
 type Props = {
@@ -17,9 +18,11 @@ type Props = {
   episodes: Episode[];
   now: Date;
   onLog?: () => void;
+  /** Brief confirmation after the big button (replaces the hint while shown). */
+  confirmation?: string | null;
 };
 
-export function HomeScreen({ name, episodes, now, onLog }: Props) {
+export function HomeScreen({ name, episodes, now, onLog, confirmation }: Props) {
   const latest = latestEpisode(episodes);
   const open = openEpisode(episodes);
   // While one is going, the card shows the migraine before it.
@@ -54,9 +57,15 @@ export function HomeScreen({ name, episodes, now, onLog }: Props) {
       <div className={open ? "mt-4 mb-4" : "mt-10 mb-4"}>
         <LogButton onLog={onLog} ongoing={open !== null} />
       </div>
-      <p className="text-center text-sm text-dusk-muted">
-        {open ? "The time is saved for you. Details can wait." : "Details can wait until you feel better"}
-      </p>
+      <div className="flex min-h-6 items-center justify-center">
+        {confirmation ? (
+          <LoggedCheck message={confirmation} />
+        ) : (
+          <p className="text-center text-sm text-dusk-muted">
+            {open ? "The time is saved for you. Details can wait." : "Details can wait until you feel better"}
+          </p>
+        )}
+      </div>
 
       {cardEpisode && (
         <section aria-label="Most recent migraine" className="mt-8">
