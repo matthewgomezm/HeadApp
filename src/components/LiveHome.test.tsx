@@ -39,29 +39,20 @@ test("tap → pain sheet → pick 7 → upserted with pain", async () => {
   expect(refresh).toHaveBeenCalled();
 });
 
-test("an unsynced open episode shows as in progress after reload", () => {
-  enqueue({ id: "q1", patch: { started_at: new Date().toISOString() } }, storage);
+test("an unsynced tap shows as today's migraine after reload", () => {
+  enqueue({ id: "q1", patch: { started_at: new Date().toISOString(), peak_pain: 5 } }, storage);
   const upsert = vi.fn().mockResolvedValue({ error: new Error("offline") });
   render(<LiveHome name="Jadyn" initial={[]} upsert={upsert} storage={storage} />);
-  expect(screen.getByText(/Migraine in progress since/)).toBeInTheDocument();
+  expect(screen.getByText("Your last migraine was today")).toBeInTheDocument();
+  expect(screen.getByText(/5\/10/)).toBeInTheDocument();
 });
 
-test("It's over on a server-open episode switches back to the big button", async () => {
+test("after picking pain, the big button is available again", async () => {
   const user = userEvent.setup();
-  const upsert = vi.fn().mockResolvedValue({ error: new Error("offline") });
-  const open = {
-    id: "srv1",
-    startedAt: new Date().toISOString(),
-    endedAt: null,
-    peakPain: 5,
-    locations: [],
-    symptoms: [],
-    triggers: [],
-    notes: "",
-    medications: [],
-  };
-  render(<LiveHome name="Jadyn" initial={[open]} upsert={upsert} storage={storage} />);
-  await user.click(screen.getByRole("button", { name: "It's over" }));
+  const upsert = vi.fn().mockResolvedValue({ error: null });
+  render(<LiveHome name="Jadyn" initial={[]} upsert={upsert} storage={storage} />);
+  await user.click(screen.getByRole("button", { name: /I have a migraine/ }));
+  await user.click(screen.getByRole("button", { name: "Skip" }));
   expect(screen.getByRole("button", { name: /I have a migraine/ })).toBeInTheDocument();
-  expect(pending(storage)[0]).toMatchObject({ id: "srv1", patch: { ended_at: expect.any(String) } });
+  expect(screen.queryByText(/in progress/i)).toBeNull();
 });

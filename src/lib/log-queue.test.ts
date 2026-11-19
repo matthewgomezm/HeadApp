@@ -1,6 +1,6 @@
 import { beforeEach, describe, expect, test, vi } from "vitest";
 import { MemStorage } from "@/test/mem-storage";
-import { enqueue, flush, localOpenEpisode, pending } from "./log-queue";
+import { enqueue, flush, localEpisodes, pending } from "./log-queue";
 
 let s: MemStorage;
 beforeEach(() => {
@@ -108,17 +108,16 @@ describe("flush", () => {
   });
 });
 
-describe("localOpenEpisode", () => {
-  test("returns the queued open episode", () => {
+describe("localEpisodes", () => {
+  test("returns queued starts, newest first", () => {
     enqueue({ id: "a", patch: { started_at: T0, peak_pain: 6 } }, s);
-    expect(localOpenEpisode(s)).toEqual({ id: "a", startedAt: new Date(T0), peakPain: 6 });
+    enqueue({ id: "b", patch: { started_at: "2026-11-18T15:00:00.000Z" } }, s);
+    enqueue({ id: "c", patch: { peak_pain: 2 } }, s); // pain-only update for a synced episode
+    expect(localEpisodes(s)).toEqual([
+      { id: "b", startedAt: new Date("2026-11-18T15:00:00.000Z"), peakPain: null },
+      { id: "a", startedAt: new Date(T0), peakPain: 6 },
+    ]);
   });
 
-  test("null once ended", () => {
-    enqueue({ id: "a", patch: { started_at: T0 } }, s);
-    enqueue({ id: "a", patch: { ended_at: "2026-11-18T16:00:00.000Z" } }, s);
-    expect(localOpenEpisode(s)).toBeNull();
-  });
-
-  test("null when queue empty", () => expect(localOpenEpisode(s)).toBeNull());
+  test("empty when queue empty", () => expect(localEpisodes(s)).toEqual([]));
 });

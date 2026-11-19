@@ -1,12 +1,13 @@
 "use client";
 
 import { useRouter } from "next/navigation";
-import { useCallback, useEffect, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { deserializeEpisode, type SerializedEpisode } from "@/lib/episode-rows";
+import type { Episode } from "@/lib/episodes";
 import { lazyBrowserUpsert } from "@/lib/episode-sync";
-import { enqueue, flush, localOpenEpisode, pending, type Upsert } from "@/lib/log-queue";
+import { enqueue, flush, localEpisodes, type Upsert } from "@/lib/log-queue";
 import { useNow } from "@/lib/use-now";
-import { HomeScreen, type OpenEpisode } from "./HomeScreen";
+import { HomeScreen } from "./HomeScreen";
 import { PainSheet } from "./PainSheet";
 
 type Props = {
@@ -17,28 +18,32 @@ type Props = {
   storage?: Storage;
 };
 
-function resolveOpen(
-  server: { id: string; startedAt: Date; endedAt: Date | null }[],
-  storage: Storage | undefined,
-): OpenEpisode | null {
-  const local = localOpenEpisode(storage);
-  if (local) return { id: local.id, startedAt: local.startedAt };
-  const endedLocally = new Set(
-    pending(storage)
-      .filter((o) => o.patch.ended_at)
-      .map((o) => o.id),
-  );
-  const srv = server.find((e) => e.endedAt === null && !endedLocally.has(e.id));
-  return srv ? { id: srv.id, startedAt: srv.startedAt } : null;
+/** Server episodes plus taps still waiting on this device (so a fresh tap shows immediately). */
+function mergeLocal(server: Episode[], storage: Storage | undefined): Episode[] {
+  const known = new Set(server.map((e) => e.id));
+  const local = localEpisodes(storage)
+    .filter((l) => !known.has(l.id))
+    .map<Episode>((l) => ({
+      id: l.id,
+      startedAt: l.startedAt,
+      peakPain: l.peakPain,
+      locations: [],
+      symptoms: [],
+      triggers: [],
+      notes: "",
+      medications: [],
+    }));
+  return [...local, ...server];
 }
 
 export function LiveHome({ name, initial, upsert: injected, storage }: Props) {
   const router = useRouter();
   const now = useNow();
-  const episodes = useMemo(() => initial.map(deserializeEpisode), [initial]);
+  const server = useMemo(() => initial.map(deserializeEpisode), [initial]);
   const upsert = injected ?? lazyBrowserUpsert;
   const [version, setVersion] = useState(0); // bump after queue changes
   const [painFor, setPainFor] = useState<string | null>(null);
+  const logging = useRef(false); // blocks a second tap landing in the same instant
 
   const sync = useCallback(async () => {
     const { sent } = await flush(upsert, storage);
@@ -52,10 +57,10 @@ export function LiveHome({ name, initial, upsert: injected, storage }: Props) {
     return () => window.removeEventListener("online", onOnline);
   }, [sync]);
 
-  // version is read so the open state recomputes after enqueue
-  const open = useMemo(
-    () => (version >= 0 ? resolveOpen(episodes, storage) : null),
-    [episodes, storage, version],
+  // version is read so the list recomputes after enqueue
+  const episodes = useMemo(
+    () => (version >= 0 ? mergeLocal(server, storage) : server),
+    [server, storage, version],
   );
 
   function change() {
@@ -64,8 +69,8 @@ export function LiveHome({ name, initial, upsert: injected, storage }: Props) {
   }
 
   function onLog() {
-    // Read storage directly so a second tap before re-render is ignored.
-    if (resolveOpen(episodes, storage)) return;
+    if (logging.current) return;
+    logging.current = true;
     const id = crypto.randomUUID();
     enqueue({ id, patch: { started_at: new Date().toISOString() } }, storage);
     setPainFor(id);
@@ -75,12 +80,7 @@ export function LiveHome({ name, initial, upsert: injected, storage }: Props) {
   function onPick(n: number | null) {
     if (painFor && n !== null) enqueue({ id: painFor, patch: { peak_pain: n } }, storage);
     setPainFor(null);
-    change();
-  }
-
-  function onEnd() {
-    if (!open) return;
-    enqueue({ id: open.id, patch: { ended_at: new Date().toISOString() } }, storage);
+    logging.current = false;
     change();
   }
 
@@ -88,14 +88,7 @@ export function LiveHome({ name, initial, upsert: injected, storage }: Props) {
 
   return (
     <>
-      <HomeScreen
-        name={name}
-        episodes={episodes}
-        now={now}
-        openEpisode={open}
-        onLog={onLog}
-        onEnd={onEnd}
-      />
+      <HomeScreen name={name} episodes={episodes} now={now} onLog={onLog} />
       {painFor && <PainSheet onPick={(n) => onPick(n)} onSkip={() => onPick(null)} />}
     </>
   );

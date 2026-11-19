@@ -1,4 +1,3 @@
-/** In-memory Storage for tests. */
 export class MemStorage implements Storage {
   private m = new Map<string, string>();
   get length() {

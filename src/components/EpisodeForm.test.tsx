@@ -7,7 +7,6 @@ import { EpisodeForm } from "./EpisodeForm";
 const initial: Episode = {
   id: "6f1c1c1e-0000-4000-8000-000000000001",
   startedAt: new Date(2026, 10, 14, 9, 0),
-  endedAt: new Date(2026, 10, 14, 15, 20),
   peakPain: 7,
   locations: [],
   symptoms: [],
@@ -15,6 +14,13 @@ const initial: Episode = {
   notes: "",
   medications: [],
 };
+
+test("only a start time, no end time or still-going", () => {
+  render(<EpisodeForm initial={initial} usedTriggers={[]} usedMedications={[]} onSave={vi.fn()} />);
+  expect(screen.getByLabelText("Started")).toBeInTheDocument();
+  expect(screen.queryByLabelText("Ended")).toBeNull();
+  expect(screen.queryByText("Still going")).toBeNull();
+});
 
 test("renders all sections", () => {
   render(<EpisodeForm initial={initial} usedTriggers={[]} usedMedications={[]} onSave={vi.fn()} />);
@@ -49,8 +55,8 @@ test("used medications appear as chips and can be added", async () => {
 
 test("shows the save error", async () => {
   const user = userEvent.setup();
-  const onSave = vi.fn().mockResolvedValue({ ok: false, error: "End time must be after the start" });
+  const onSave = vi.fn().mockResolvedValue({ ok: false, error: "Start time can't be in the future" });
   render(<EpisodeForm initial={initial} usedTriggers={[]} usedMedications={[]} onSave={onSave} />);
   await user.click(screen.getByRole("button", { name: "Save" }));
-  expect(await screen.findByText("End time must be after the start")).toBeInTheDocument();
+  expect(await screen.findByText("Start time can't be in the future")).toBeInTheDocument();
 });

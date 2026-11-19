@@ -22,8 +22,8 @@ test("a patch with started_at is upserted by id", async () => {
 
 test("a patch without started_at is an update (partial upsert would violate NOT NULL)", async () => {
   const f = fakeClient();
-  await makeUpsert(f.client)({ id: "a", ended_at: "2026-11-18T16:00:00Z" });
-  expect(f.update).toHaveBeenCalledWith({ ended_at: "2026-11-18T16:00:00Z" });
+  await makeUpsert(f.client)({ id: "a", peak_pain: 4 });
+  expect(f.update).toHaveBeenCalledWith({ peak_pain: 4 });
   expect(f.eq).toHaveBeenCalledWith("id", "a");
   expect(f.upsert).not.toHaveBeenCalled();
 });

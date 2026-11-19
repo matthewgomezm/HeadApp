@@ -49,8 +49,6 @@ const union = (...lists: readonly (readonly string[])[]) => [...new Set(lists.fl
 
 export function EpisodeForm({ initial, usedTriggers, usedMedications, onSave, onDelete }: Props) {
   const [start, setStart] = useState(toLocalInputValue(initial.startedAt));
-  const [stillGoing, setStillGoing] = useState(initial.endedAt === null);
-  const [end, setEnd] = useState(toLocalInputValue(initial.endedAt ?? new Date()));
   const [pain, setPain] = useState<number | null>(initial.peakPain);
   const [locations, setLocations] = useState(initial.locations);
   const [symptoms, setSymptoms] = useState(initial.symptoms);
@@ -93,7 +91,6 @@ export function EpisodeForm({ initial, usedTriggers, usedMedications, onSave, on
     const input: EpisodeInput = {
       ...(initial.id ? { id: initial.id } : {}),
       startedAt: fromLocalInputValue(start).toISOString(),
-      endedAt: stillGoing ? null : fromLocalInputValue(end).toISOString(),
       peakPain: pain,
       locations,
       symptoms,
@@ -128,27 +125,6 @@ export function EpisodeForm({ initial, usedTriggers, usedMedications, onSave, on
             className={field}
           />
         </label>
-        <label className="mt-4 flex min-h-11 items-center gap-3">
-          <input
-            type="checkbox"
-            checked={stillGoing}
-            onChange={(e) => setStillGoing(e.target.checked)}
-            className="size-6 accent-dusk-accent"
-          />
-          <span>Still going</span>
-        </label>
-        {!stillGoing && (
-          <label className="mt-2 block">
-            <span className="text-sm text-dusk-muted">Ended</span>
-            <input
-              type="datetime-local"
-              required
-              value={end}
-              onChange={(e) => setEnd(e.target.value)}
-              className={field}
-            />
-          </label>
-        )}
       </Section>
 
       <Section title="How bad">

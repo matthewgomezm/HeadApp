@@ -3,19 +3,16 @@ import {
   daysSinceLabel,
   episodeHeadline,
   episodeSubline,
-  formatDuration,
   latestEpisode,
   type Episode,
 } from "./episodes";
 
 const start = new Date(2026, 10, 14, 9, 0); // Sat Nov 14 2026, local
-const plus = (d: Date, mins: number) => new Date(d.getTime() + mins * 60_000);
 
 function ep(overrides: Partial<Episode> = {}): Episode {
   return {
     id: "e1",
     startedAt: start,
-    endedAt: plus(start, 380),
     peakPain: 7,
     locations: [],
     symptoms: [],
@@ -47,35 +44,28 @@ describe("daysSinceLabel", () => {
   });
 });
 
-describe("formatDuration", () => {
-  test("hours and minutes", () => expect(formatDuration(start, plus(start, 380))).toBe("6h 20m"));
-  test("minutes only", () => expect(formatDuration(start, plus(start, 45))).toBe("45m"));
-  test("whole hours", () => expect(formatDuration(start, plus(start, 120))).toBe("2h"));
-  test("in progress", () => expect(formatDuration(start, null)).toBe("In progress"));
-});
-
 describe("episodeHeadline", () => {
   test("with pain", () => expect(episodeHeadline(ep())).toBe("Sat, Nov 14 · 7/10"));
   test("without pain", () => expect(episodeHeadline(ep({ peakPain: null }))).toBe("Sat, Nov 14"));
 });
 
 describe("episodeSubline", () => {
-  test("medication helped", () => expect(episodeSubline(ep())).toBe("6h 20m · Sumatriptan helped"));
-  test("no medications", () => expect(episodeSubline(ep({ medications: [] }))).toBe("6h 20m"));
+  test("start time and medication helped", () =>
+    expect(episodeSubline(ep())).toBe("9:00 AM · Sumatriptan helped"));
+  test("no medications → start time only", () =>
+    expect(episodeSubline(ep({ medications: [] }))).toBe("9:00 AM"));
   test("medication didn't help", () =>
     expect(episodeSubline(ep({ medications: [{ name: "Sumatriptan", takenAt: null, helped: "no" }] }))).toBe(
-      "6h 20m · Sumatriptan didn't help",
+      "9:00 AM · Sumatriptan didn't help",
     ));
   test("helped a little", () =>
     expect(episodeSubline(ep({ medications: [{ name: "Advil", takenAt: null, helped: "somewhat" }] }))).toBe(
-      "6h 20m · Advil helped a little",
+      "9:00 AM · Advil helped a little",
     ));
   test("unknown → name only", () =>
     expect(episodeSubline(ep({ medications: [{ name: "Advil", takenAt: null, helped: "unknown" }] }))).toBe(
-      "6h 20m · Advil",
+      "9:00 AM · Advil",
     ));
-  test("in progress", () =>
-    expect(episodeSubline(ep({ endedAt: null, medications: [] }))).toBe("In progress"));
 });
 
 describe("latestEpisode", () => {

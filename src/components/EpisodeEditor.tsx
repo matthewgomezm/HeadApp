@@ -22,7 +22,6 @@ function newDraft(now: Date): Episode {
   return {
     id: "",
     startedAt: start,
-    endedAt: new Date(start.getTime() + 60 * 60_000),
     peakPain: null,
     locations: [],
     symptoms: [],

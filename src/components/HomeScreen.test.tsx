@@ -24,35 +24,24 @@ describe("HomeScreen", () => {
     expect(screen.getByRole("button", { name: /I have a migraine/ })).toBeInTheDocument();
   });
 
-  test("days since counts from when the last migraine ended", () => {
-    const e: Episode = {
-      ...sampleEpisodes[0],
-      startedAt: new Date(2026, 10, 17, 23, 0),
-      endedAt: new Date(2026, 10, 18, 3, 0),
-    };
+  test("days since counts from when the last migraine started", () => {
+    const e: Episode = { ...sampleEpisodes[0], startedAt: new Date(2026, 10, 17, 23, 0) };
     render(<HomeScreen name="Jadyn" episodes={[e]} now={now} />);
-    expect(screen.getByText("Your last migraine was today")).toBeInTheDocument();
+    expect(screen.getByText("1 day since your last migraine")).toBeInTheDocument();
   });
 
-  test("a migraine still in progress counts as today", () => {
-    const e: Episode = { ...sampleEpisodes[0], startedAt: new Date(2026, 10, 17, 20, 0), endedAt: null };
-    render(<HomeScreen name="Jadyn" episodes={[e]} now={now} />);
-    expect(screen.getByText("Your last migraine was today")).toBeInTheDocument();
-  });
-
-  test("in-progress state replaces the big button", () => {
-    render(
-      <HomeScreen
-        name="Jadyn"
-        episodes={sampleEpisodes}
-        now={now}
-        openEpisode={{ id: "abc", startedAt: new Date(2026, 10, 18, 9, 5) }}
-      />,
+  test("latest migraine card links to its details", () => {
+    render(<HomeScreen name="Jadyn" episodes={sampleEpisodes} now={now} />);
+    expect(screen.getByRole("link", { name: /Sat, Nov 14/ })).toHaveAttribute(
+      "href",
+      `/episodes/${sampleEpisodes[0].id}`,
     );
-    expect(screen.getByText(/Migraine in progress since/)).toBeInTheDocument();
-    expect(screen.getByRole("button", { name: "It's over" })).toBeInTheDocument();
-    expect(screen.getByRole("link", { name: "Add details" })).toHaveAttribute("href", "/episodes/abc");
-    expect(screen.queryByRole("button", { name: /I have a migraine/ })).toBeNull();
+  });
+
+  test("no end-time UI", () => {
+    render(<HomeScreen name="Jadyn" episodes={sampleEpisodes} now={now} />);
+    expect(screen.queryByText(/in progress/i)).toBeNull();
+    expect(screen.queryByRole("button", { name: "It's over" })).toBeNull();
   });
 
   test("long trigger names wrap", () => {

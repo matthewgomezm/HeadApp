@@ -15,7 +15,6 @@ export async function saveEpisode(raw: unknown): Promise<SaveResult> {
 
   const row = {
     started_at: v.startedAt,
-    ended_at: v.endedAt,
     peak_pain: v.peakPain,
     locations: v.locations,
     symptoms: v.symptoms,

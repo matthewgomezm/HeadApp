@@ -52,7 +52,6 @@ export function episodeInputSchema(now: Date = new Date()) {
     .object({
       id: z.uuid().optional(),
       startedAt: isoDate,
-      endedAt: isoDate.nullable(),
       peakPain: z.int().min(1).max(10).nullable(),
       locations: labelList,
       symptoms: labelList,
@@ -71,10 +70,6 @@ export function episodeInputSchema(now: Date = new Date()) {
     .refine((v) => new Date(v.startedAt).getTime() <= now.getTime() + FUTURE_SLACK_MS, {
       message: "Start time can't be in the future",
       path: ["startedAt"],
-    })
-    .refine((v) => v.endedAt === null || new Date(v.endedAt) >= new Date(v.startedAt), {
-      message: "End time must be after the start",
-      path: ["endedAt"],
     });
 }
 

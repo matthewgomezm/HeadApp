@@ -3,7 +3,6 @@
 
 export type EpisodePatch = {
   started_at?: string;
-  ended_at?: string | null;
   peak_pain?: number | null;
 };
 
@@ -105,15 +104,12 @@ export function flush(
   return run;
 }
 
-export function localOpenEpisode(
+/** Taps saved on the device that may not have reached the database yet, newest first. */
+export function localEpisodes(
   storage: Storage | undefined = defaultStorage(),
-): { id: string; startedAt: Date; peakPain: number | null } | null {
-  const ops = read(storage);
-  for (let i = ops.length - 1; i >= 0; i--) {
-    const { id, patch } = ops[i];
-    if (patch.started_at && !patch.ended_at) {
-      return { id, startedAt: new Date(patch.started_at), peakPain: patch.peak_pain ?? null };
-    }
-  }
-  return null;
+): { id: string; startedAt: Date; peakPain: number | null }[] {
+  return read(storage)
+    .filter((o) => o.patch.started_at)
+    .map((o) => ({ id: o.id, startedAt: new Date(o.patch.started_at!), peakPain: o.patch.peak_pain ?? null }))
+    .sort((a, b) => b.startedAt.getTime() - a.startedAt.getTime());
 }

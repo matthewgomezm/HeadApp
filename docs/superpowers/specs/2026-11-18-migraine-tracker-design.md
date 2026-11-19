@@ -87,9 +87,12 @@ than features.
 - **Stage 1, during a migraine (Home):** big "I have a migraine" button.
   Tap → creates an episode with `started_at = now`, then a single screen of
   large 1–10 pain buttons (optional — can be skipped). Done.
-- While an episode is open, Home shows "Migraine in progress since 2:40pm"
-  with an **"It's over"** button (sets `ended_at`) and an "add details" link.
-- **Stage 2, later (episode detail):** editable start/end time, peak pain,
+- **Only the start time is tracked** (decided by Matthew, 2026-11-18): no end
+  time, no "in progress" state, no "It's over" button — ending a migraine was
+  one step too many. After the pain screen Home is back to the big button and
+  the new migraine is the latest card (tap it to add details). A rapid second
+  tap is ignored while the pain screen is opening.
+- **Stage 2, later (episode detail):** editable start time, peak pain,
   location (left / right / both / behind eyes / back of head / forehead),
   symptoms (aura, nausea, vomiting, light sensitivity, sound sensitivity,
   smell sensitivity, dizziness), medications (name, time, helped:
@@ -127,8 +130,8 @@ than features.
 - **Definition** *(builder's call)*: unit is her local calendar day. A day D
   "has the condition" based on that day's `daily_context` (sleep = the night
   ending on D's morning; pressure change = D vs D−1). D "leads to a migraine"
-  if an episode **starts** on D or D+1. Days on which an episode was already
-  in progress at midnight are excluded from both numerator and denominator.
+  if an episode **starts** on D or D+1. (No end times, so no "already in
+  progress" exclusion.)
   Days with missing data for that condition are excluded for that condition.
 - Below a minimum sample size (e.g. fewer than ~5 events on either side) show
   "not enough data yet" instead of a ratio.
@@ -140,7 +143,7 @@ than features.
 
 ### Doctor tab
 - A print-friendly summary for a chosen date range: migraines per month,
-  average/longest duration, pain distribution, medication use and how often
+  pain distribution, medication use and how often
   each helped, top recorded triggers, the strongest measured conditions, and
   a chronological list of episodes.
 - Printed via the browser (Print / Save as PDF). Print styles use a light
@@ -181,7 +184,8 @@ than features.
 - System font stack.
 
 ### Data model (Supabase / Postgres, all tables RLS on `user_id = auth.uid()`)
-- `episodes` — id, user_id, started_at, ended_at (nullable), peak_pain
+- `episodes` — id, user_id, started_at, ended_at (nullable, unused since
+  end times were dropped; kept so no migration is needed), peak_pain
   (1–10, nullable), locations text[], symptoms text[], triggers text[],
   notes, created_at, updated_at.
 - `medication_doses` — id, episode_id, user_id, name, taken_at, helped
@@ -207,7 +211,7 @@ than features.
    better", most recent episode card with trigger tags, bottom tab bar) —
    static placeholder data, no backend yet. The implementation plan covers
    Phase 1 in detail; later phases get their own plans.
-2. Supabase + email-code auth, episodes: one-tap log, "It's over", detail
+2. Supabase + email/password auth, episodes: one-tap log with pain, detail
    edit, History list.
 3. Weather cron + Settings home location; Insights charts and likelihoods.
 4. Doctor summary page with print styles.

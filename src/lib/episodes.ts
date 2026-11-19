@@ -7,7 +7,6 @@ export type Medication = { id?: string; name: string; takenAt: Date | null; help
 export type Episode = {
   id: string;
   startedAt: Date;
-  endedAt: Date | null;
   peakPain: number | null;
   locations: string[];
   symptoms: string[];
@@ -34,16 +33,6 @@ export function daysSinceLabel(last: Date | null, now: Date): string {
   return `${days} ${days === 1 ? "day" : "days"} since your last migraine`;
 }
 
-export function formatDuration(startedAt: Date, endedAt: Date | null): string {
-  if (!endedAt) return "In progress";
-  const totalMin = Math.max(0, Math.round((endedAt.getTime() - startedAt.getTime()) / 60_000));
-  const h = Math.floor(totalMin / 60);
-  const m = totalMin % 60;
-  if (h === 0) return `${m}m`;
-  if (m === 0) return `${h}h`;
-  return `${h}h ${m}m`;
-}
-
 export function episodeHeadline(e: Episode): string {
   const date = e.startedAt.toLocaleDateString("en-US", {
     weekday: "short",
@@ -61,7 +50,7 @@ const HELPED_TEXT: Record<Helped, string> = {
 };
 
 export function episodeSubline(e: Episode): string {
-  const parts = [formatDuration(e.startedAt, e.endedAt)];
+  const parts = [e.startedAt.toLocaleTimeString("en-US", { hour: "numeric", minute: "2-digit" })];
   const med = e.medications[0];
   if (med) parts.push(`${med.name}${HELPED_TEXT[med.helped]}`);
   return parts.join(" · ");
