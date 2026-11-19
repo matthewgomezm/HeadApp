@@ -1,4 +1,3 @@
-# ── Dependencies ─────────────────────────────
 node_modules/
 .pnp
 .pnp.*
@@ -8,49 +7,42 @@ node_modules/
 !.yarn/releases
 !.yarn/versions
 
-# ── Next.js build output ─────────────────────
 .next/
 out/
 build/
 next-env.d.ts
 *.tsbuildinfo
 
-# ── Testing ──────────────────────────────────
 coverage/
 .vitest/
 
-# ── Environment / secrets (Supabase keys, ingest tokens) ──
 .env
 .env*.local
 .env.development
 .env.test
 .env.production
-# keep a template committed:
 !.env.example
 
-# ── Deploy / backend tooling ─────────────────
+
 .vercel/
 supabase/.branches/
 supabase/.temp/
 
-# ── Logs ─────────────────────────────────────
+
 npm-debug.log*
 yarn-debug.log*
 yarn-error.log*
 .pnpm-debug.log*
 
-# ── OS ───────────────────────────────────────
+
 .DS_Store
 Thumbs.db
 
-# ── Editors / AI tools ───────────────────────
 .vscode/
 .idea/
 .cursor/
 .claude/
 
-# ── Misc ─────────────────────────────────────
 *.pem
 
-# ── Brainstorm mockups & plan-execution scratch ──
 .superpowers/
