@@ -1,4 +1,6 @@
 import { render, screen } from "@testing-library/react";
+import { readFileSync } from "node:fs";
+import { join } from "node:path";
 import { beforeEach, expect, test, vi } from "vitest";
 import { TabBar } from "./TabBar";
 
@@ -28,8 +30,27 @@ test("only the current tab is marked active", () => {
   expect(current.map((l) => l.textContent)).toEqual(["Insights"]);
 });
 
+test("episode detail pages keep History active", () => {
+  pathname = "/episodes/6f1c1c1e-0000-4000-8000-000000000001";
+  render(<TabBar />);
+  expect(screen.getByRole("link", { name: "History" })).toHaveAttribute("aria-current", "page");
+});
+
 test("hidden on the login page", () => {
   pathname = "/login";
   render(<TabBar />);
   expect(screen.queryByRole("navigation")).toBeNull();
+});
+
+test("uses the Kokonut split nav, with ≥48px tap targets", () => {
+  render(<TabBar />);
+  for (const link of screen.getAllByRole("link")) {
+    expect(link).toHaveClass("h-12");
+  }
+});
+
+test("split nav is recolored to Dusk (no zinc/orange/white leftovers)", () => {
+  const src = readFileSync(join(process.cwd(), "src/components/kokonutui/morphic-navbar.tsx"), "utf8");
+  expect(src).not.toMatch(/zinc-|orange-|text-white|bg-white/);
+  expect(src).toMatch(/dusk-accent/);
 });

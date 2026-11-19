@@ -1,47 +1,36 @@
 "use client";
 
-import Link from "next/link";
 import { usePathname } from "next/navigation";
+import { MorphicNavbar } from "@/components/kokonutui/morphic-navbar";
 
-const TABS = [
-  { href: "/", label: "Home" },
-  { href: "/history", label: "History" },
-  { href: "/insights", label: "Insights" },
-  { href: "/doctor", label: "Doctor" },
-] as const;
+const TABS = {
+  "/": { name: "Home" },
+  "/history": { name: "History" },
+  "/insights": { name: "Insights" },
+  "/doctor": { name: "Doctor" },
+};
 
+/** Bottom bar: Kokonut's split nav, recolored to Dusk, above the iPhone home indicator. */
 export function TabBar() {
-  return <TabBarView pathname={usePathname()} />;
+  const pathname = usePathname();
+  if (pathname.startsWith("/login")) return null;
+  return (
+    <div className="fixed inset-x-0 bottom-0 bg-dusk-tabbar pb-[env(safe-area-inset-bottom)]">
+      <MorphicNavbar
+        items={TABS}
+        // Episode detail/new pages belong to History.
+        defaultPath={pathname.startsWith("/episodes") ? "/history" : undefined}
+      />
+    </div>
+  );
 }
 
-/** Pure view; `pathname: null` (Suspense fallback) renders with no active tab. */
-export function TabBarView({ pathname }: { pathname: string | null }) {
-  if (pathname?.startsWith("/login")) return null;
-  // Episode detail/new pages belong to History.
-  const current = pathname?.startsWith("/episodes") ? "/history" : pathname;
+/** Same-size empty bar shown while the real one loads (keeps the layout from jumping). */
+export function TabBarPlaceholder() {
   return (
-    <nav
-      aria-label="Main"
-      className="fixed inset-x-0 bottom-0 bg-dusk-tabbar pb-[env(safe-area-inset-bottom)]"
-    >
-      <ul className="mx-auto flex max-w-md justify-around">
-        {TABS.map(({ href, label }) => {
-          const active = current === href;
-          return (
-            <li key={href} className="flex-1">
-              <Link
-                href={href}
-                aria-current={active ? "page" : undefined}
-                className={`flex min-h-12 items-center justify-center py-3 text-sm ${
-                  active ? "font-semibold text-dusk-accent" : "text-dusk-muted"
-                }`}
-              >
-                {label}
-              </Link>
-            </li>
-          );
-        })}
-      </ul>
-    </nav>
+    <div
+      aria-hidden="true"
+      className="fixed inset-x-0 bottom-0 h-16 bg-dusk-tabbar pb-[env(safe-area-inset-bottom)] box-content"
+    />
   );
 }

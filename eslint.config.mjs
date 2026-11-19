@@ -12,6 +12,9 @@ const eslintConfig = defineConfig([
     "out/**",
     "build/**",
     "next-env.d.ts",
+    // Vendored Kokonut UI components (installed via the shadcn CLI, linted
+    // upstream with Biome). Only their colors/sizes are edited here.
+    "src/components/kokonutui/**",
   ]),
 ]);
 
