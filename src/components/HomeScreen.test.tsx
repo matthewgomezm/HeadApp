@@ -38,6 +38,15 @@ describe("HomeScreen", () => {
     );
   });
 
+  test("shows a migraine totals card (last 30 days by default)", () => {
+    render(<HomeScreen name="Jadyn" episodes={sampleEpisodes} now={now} />);
+    // sample migraines on Oct 22, Nov 3 and Nov 14: all within the last 30 days
+    const card = screen.getByTestId("migraine-totals");
+    expect(card).toHaveTextContent("Migraines");
+    expect(card.querySelector(".sr-only")?.textContent).toBe("3");
+    expect(card).toHaveTextContent("Severe (7–10)");
+  });
+
   test("no end-time UI", () => {
     render(<HomeScreen name="Jadyn" episodes={sampleEpisodes} now={now} />);
     expect(screen.queryByText(/in progress/i)).toBeNull();

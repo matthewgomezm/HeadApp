@@ -1,5 +1,7 @@
 import { daysSinceLabel, latestEpisode, type Episode } from "@/lib/episodes";
+import { METRIC_SEGMENTS, migraineMetricData } from "@/lib/migraine-metrics";
 import { EpisodeCard } from "./EpisodeCard";
+import MetricCard from "./kokonutui/metric-card";
 import { LogButton } from "./LogButton";
 
 type Props = {
@@ -33,6 +35,19 @@ export function HomeScreen({ name, episodes, now, onLog }: Props) {
           <EpisodeCard episode={latest} href={`/episodes/${latest.id}`} />
         </section>
       )}
+
+      <section aria-label="Migraine totals" data-testid="migraine-totals" className="mt-6">
+        <MetricCard
+          label="Migraines"
+          segments={METRIC_SEGMENTS}
+          data={migraineMetricData(episodes, now, 180)}
+          events={[]}
+          periods={[7, 30, 90]}
+          defaultPeriod={30}
+          format="number"
+          upIsGood={false}
+        />
+      </section>
     </main>
   );
 }
