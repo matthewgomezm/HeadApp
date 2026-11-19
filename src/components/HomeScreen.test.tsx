@@ -38,6 +38,16 @@ describe("HomeScreen", () => {
     );
   });
 
+  test("date, greeting and days-since sit together in one framed card, above the button", () => {
+    render(<HomeScreen name="Jadyn" episodes={sampleEpisodes} now={now} />);
+    const greeting = screen.getByRole("heading", { name: "Hi Jadyn" });
+    const card = greeting.closest('[data-slot="card"]') as HTMLElement;
+    expect(card).not.toBeNull();
+    expect(card).toHaveTextContent("Wed, Nov 18");
+    expect(card).toHaveTextContent("4 days since your last migraine");
+    expect(card).not.toContainElement(screen.getByRole("button", { name: /I have a migraine/ }));
+  });
+
   test("shows a migraine totals card (last 30 days by default)", () => {
     render(<HomeScreen name="Jadyn" episodes={sampleEpisodes} now={now} />);
     // sample migraines on Oct 22, Nov 3 and Nov 14: all within the last 30 days
