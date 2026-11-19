@@ -72,10 +72,13 @@ than features.
   status bar style `black-translucent`. Respect safe-area insets.
 
 ### Auth
-- Supabase Auth with **email one-time code** (6 digits), *not* magic links.
-  Reason: on iOS a home-screen web app has storage separate from Safari, so a
-  magic link opens Safari and logs in there, not in the app. A typed code
-  keeps the session inside the home-screen app.
+- Supabase Auth with **email + password** (decided 2026-11-18), *not* magic
+  links. Reason: on iOS a home-screen web app has storage separate from
+  Safari, so a magic link opens Safari and logs in there, not in the app.
+  Email one-time codes were the first choice, but Supabase only allows editing
+  the email template (to include the code) with a custom SMTP server; a
+  password needs no email at all and still signs in inside the app.
+- Accounts are created by Matthew in the Supabase dashboard with a password.
 - Long-lived session; she should essentially never see the login again.
 - Only her account is allowed (sign-ups disabled after her account exists, or
   an email allowlist).
