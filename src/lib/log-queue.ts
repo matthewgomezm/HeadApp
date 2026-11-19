@@ -3,6 +3,7 @@
 
 export type EpisodePatch = {
   started_at?: string;
+  ended_at?: string | null;
   peak_pain?: number | null;
 };
 
@@ -107,9 +108,14 @@ export function flush(
 /** Taps saved on the device that may not have reached the database yet, newest first. */
 export function localEpisodes(
   storage: Storage | undefined = defaultStorage(),
-): { id: string; startedAt: Date; peakPain: number | null }[] {
+): { id: string; startedAt: Date; peakPain: number | null; endedAt: Date | null }[] {
   return read(storage)
     .filter((o) => o.patch.started_at)
-    .map((o) => ({ id: o.id, startedAt: new Date(o.patch.started_at!), peakPain: o.patch.peak_pain ?? null }))
+    .map((o) => ({
+      id: o.id,
+      startedAt: new Date(o.patch.started_at!),
+      peakPain: o.patch.peak_pain ?? null,
+      endedAt: o.patch.ended_at ? new Date(o.patch.ended_at) : null,
+    }))
     .sort((a, b) => b.startedAt.getTime() - a.startedAt.getTime());
 }

@@ -24,11 +24,6 @@ describe("HomeScreen", () => {
     expect(screen.getByRole("button", { name: /I have a migraine/ })).toBeInTheDocument();
   });
 
-  test("days since counts from when the last migraine started", () => {
-    const e: Episode = { ...sampleEpisodes[0], startedAt: new Date(2026, 10, 17, 23, 0) };
-    render(<HomeScreen name="Jadyn" episodes={[e]} now={now} />);
-    expect(screen.getByText("1 day since your last migraine")).toBeInTheDocument();
-  });
 
   test("latest migraine card links to its details", () => {
     render(<HomeScreen name="Jadyn" episodes={sampleEpisodes} now={now} />);
@@ -57,10 +52,23 @@ describe("HomeScreen", () => {
     expect(card).toHaveTextContent("Severe (7–10)");
   });
 
-  test("no end-time UI", () => {
-    render(<HomeScreen name="Jadyn" episodes={sampleEpisodes} now={now} />);
-    expect(screen.queryByText(/in progress/i)).toBeNull();
-    expect(screen.queryByRole("button", { name: "It's over" })).toBeNull();
+  test("while a migraine is going, the big button becomes It's over with the elapsed time", () => {
+    const open: Episode = { ...sampleEpisodes[0], id: "open1", startedAt: new Date(2026, 10, 18, 9, 5), endedAt: null };
+    render(<HomeScreen name="Jadyn" episodes={[open, ...sampleEpisodes]} now={now} />);
+    expect(screen.getByRole("button", { name: /It's over/ })).toBeInTheDocument();
+    expect(screen.queryByRole("button", { name: /I have a migraine/ })).toBeNull();
+    expect(screen.getByText("Started 9:05 AM · 55m so far")).toBeInTheDocument();
+    expect(screen.getByText("Migraine in progress")).toBeInTheDocument();
+  });
+
+  test("days since counts from when the last migraine ended", () => {
+    const e: Episode = {
+      ...sampleEpisodes[0],
+      startedAt: new Date(2026, 10, 17, 23, 0),
+      endedAt: new Date(2026, 10, 18, 3, 0),
+    };
+    render(<HomeScreen name="Jadyn" episodes={[e]} now={now} />);
+    expect(screen.getByText("Your last migraine was today")).toBeInTheDocument();
   });
 
   test("long trigger names wrap", () => {

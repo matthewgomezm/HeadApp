@@ -7,6 +7,8 @@ export type Medication = { id?: string; name: string; takenAt: Date | null; help
 export type Episode = {
   id: string;
   startedAt: Date;
+  /** null while the migraine is still going (she presses "It's over" to set it). */
+  endedAt: Date | null;
   peakPain: number | null;
   locations: string[];
   symptoms: string[];
@@ -33,6 +35,20 @@ export function daysSinceLabel(last: Date | null, now: Date): string {
   return `${days} ${days === 1 ? "day" : "days"} since your last migraine`;
 }
 
+export function formatDuration(startedAt: Date, endedAt: Date | null): string {
+  if (!endedAt) return "In progress";
+  const totalMin = Math.max(0, Math.round((endedAt.getTime() - startedAt.getTime()) / 60_000));
+  const h = Math.floor(totalMin / 60);
+  const m = totalMin % 60;
+  if (h === 0) return `${m}m`;
+  if (m === 0) return `${h}h`;
+  return `${h}h ${m}m`;
+}
+
+export function formatTime(d: Date): string {
+  return d.toLocaleTimeString("en-US", { hour: "numeric", minute: "2-digit" });
+}
+
 export function episodeHeadline(e: Episode): string {
   const date = e.startedAt.toLocaleDateString("en-US", {
     weekday: "short",
@@ -50,7 +66,7 @@ const HELPED_TEXT: Record<Helped, string> = {
 };
 
 export function episodeSubline(e: Episode): string {
-  const parts = [e.startedAt.toLocaleTimeString("en-US", { hour: "numeric", minute: "2-digit" })];
+  const parts = [formatTime(e.startedAt), formatDuration(e.startedAt, e.endedAt)];
   const med = e.medications[0];
   if (med) parts.push(`${med.name}${HELPED_TEXT[med.helped]}`);
   return parts.join(" · ");
@@ -61,4 +77,9 @@ export function latestEpisode(list: Episode[]): Episode | null {
     (best, e) => (!best || e.startedAt > best.startedAt ? e : best),
     null,
   );
+}
+
+/** The migraine still going (no end time), most recent first; null if none. */
+export function openEpisode(list: Episode[]): Episode | null {
+  return latestEpisode(list.filter((e) => e.endedAt === null));
 }

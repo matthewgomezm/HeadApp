@@ -54,20 +54,58 @@ test("returning to the app retries sending queued taps", async () => {
   expect(pending(storage)).toEqual([]);
 });
 
-test("an unsynced tap shows as today's migraine after reload", () => {
+test("an unsynced tap shows as in progress after reload", () => {
   enqueue({ id: "q1", patch: { started_at: new Date().toISOString(), peak_pain: 5 } }, storage);
   const upsert = vi.fn().mockResolvedValue({ error: new Error("offline") });
   render(<LiveHome name="Jadyn" initial={[]} upsert={upsert} storage={storage} />);
-  expect(screen.getByText("Your last migraine was today")).toBeInTheDocument();
-  expect(screen.getByText(/5\/10/)).toBeInTheDocument();
+  expect(screen.getByRole("button", { name: /It's over/ })).toBeInTheDocument();
 });
 
-test("after picking pain, the big button is available again", async () => {
+test("press to start, pick pain, press again to end: duration tracked automatically", async () => {
   const user = userEvent.setup();
-  const upsert = vi.fn().mockResolvedValue({ error: null });
+  const upsert = vi.fn().mockResolvedValue({ error: new Error("offline") });
   render(<LiveHome name="Jadyn" initial={[]} upsert={upsert} storage={storage} />);
   await user.click(screen.getByRole("button", { name: /I have a migraine/ }));
-  await user.click(screen.getByRole("button", { name: "Skip" }));
+  await user.click(screen.getByRole("button", { name: "6" }));
+  await user.click(screen.getByRole("button", { name: /It's over/ }));
   expect(screen.getByRole("button", { name: /I have a migraine/ })).toBeInTheDocument();
-  expect(screen.queryByText(/in progress/i)).toBeNull();
+  const [op] = pending(storage);
+  expect(op.patch.started_at).toEqual(expect.any(String));
+  expect(op.patch.peak_pain).toBe(6);
+  expect(op.patch.ended_at).toEqual(expect.any(String));
+  expect(new Date(op.patch.ended_at!) >= new Date(op.patch.started_at!)).toBe(true);
+});
+
+test("double-tapping It's over ends it without starting a new migraine", async () => {
+  const upsert = vi.fn().mockResolvedValue({ error: new Error("offline") });
+  enqueue({ id: "q1", patch: { started_at: new Date(Date.now() - 600_000).toISOString() } }, storage);
+  render(<LiveHome name="Jadyn" initial={[]} upsert={upsert} storage={storage} />);
+  await act(async () => {
+    fireEvent.click(screen.getByRole("button", { name: /It's over/ }));
+  });
+  await act(async () => {
+    fireEvent.click(screen.getByRole("button", { name: /I have a migraine/ }));
+  });
+  expect(pending(storage)).toHaveLength(1);
+  expect(screen.queryByRole("heading", { name: "How bad is it?" })).toBeNull();
+});
+
+test("ending a migraine that is already saved sends just the end time", async () => {
+  const user = userEvent.setup();
+  const upsert = vi.fn().mockResolvedValue({ error: new Error("offline") });
+  const open = {
+    id: "srv1",
+    startedAt: new Date(Date.now() - 3_600_000).toISOString(),
+    endedAt: null,
+    peakPain: 5,
+    locations: [],
+    symptoms: [],
+    triggers: [],
+    notes: "",
+    medications: [],
+  };
+  render(<LiveHome name="Jadyn" initial={[open]} upsert={upsert} storage={storage} />);
+  await user.click(screen.getByRole("button", { name: /It's over/ }));
+  expect(pending(storage)).toEqual([{ id: "srv1", patch: { ended_at: expect.any(String) } }]);
+  expect(screen.getByRole("button", { name: /I have a migraine/ })).toBeInTheDocument();
 });

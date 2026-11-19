@@ -23,7 +23,7 @@ test("rowToEpisode maps fields and dates", () => {
   const e = rowToEpisode(row);
   expect(e.id).toBe("e1");
   expect(e.startedAt).toEqual(new Date("2026-11-14T17:00:00Z"));
-  expect(e).not.toHaveProperty("endedAt"); // end time is no longer tracked
+  expect(e.endedAt).toEqual(new Date("2026-11-14T23:20:00Z"));
   expect(e.peakPain).toBe(7);
   expect(e.locations).toEqual(["left side"]);
   expect(e.symptoms).toEqual(["nausea"]);
@@ -33,6 +33,10 @@ test("rowToEpisode maps fields and dates", () => {
     { id: "d1", name: "Sumatriptan", takenAt: new Date("2026-11-14T17:30:00Z"), helped: "yes" },
     { id: "d2", name: "Advil", takenAt: null, helped: "unknown" },
   ]);
+});
+
+test("null ended_at stays null (still going)", () => {
+  expect(rowToEpisode({ ...row, ended_at: null }).endedAt).toBeNull();
 });
 
 test("serialize → deserialize round-trips", () => {

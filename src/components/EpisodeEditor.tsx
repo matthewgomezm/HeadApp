@@ -17,11 +17,13 @@ type Props = {
 };
 
 function newDraft(id: string, now: Date): Episode {
+  // A past migraine: default to "an hour ago until now" (rounded to 5 minutes).
   const five = 5 * 60_000;
-  const start = new Date(Math.floor(now.getTime() / five) * five);
+  const end = new Date(Math.floor(now.getTime() / five) * five);
   return {
     id,
-    startedAt: start,
+    startedAt: new Date(end.getTime() - 60 * 60_000),
+    endedAt: end,
     peakPain: null,
     locations: [],
     symptoms: [],

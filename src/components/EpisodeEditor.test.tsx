@@ -40,6 +40,7 @@ test("a new migraine has no delete button", () => {
 const saved = {
   id: "6f1c1c1e-0000-4000-8000-000000000001",
   startedAt: new Date(2026, 10, 14, 9).toISOString(),
+  endedAt: new Date(2026, 10, 14, 11).toISOString(),
   peakPain: 5,
   locations: [],
   symptoms: [],

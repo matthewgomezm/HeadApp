@@ -7,6 +7,7 @@ function input(overrides: Record<string, unknown> = {}) {
   return {
     id: "6f1c1c1e-0000-4000-8000-000000000001",
     startedAt: "2026-11-14T17:00:00.000Z",
+    endedAt: "2026-11-14T23:20:00.000Z",
     peakPain: 7,
     locations: ["left side"],
     symptoms: ["nausea"],
@@ -28,13 +29,15 @@ describe("episodeInputSchema", () => {
 
   test("pain out of range", () => expect(parse(input({ peakPain: 11 })).success).toBe(false));
 
-  test("an endedAt field is not accepted into the output", () => {
-    const r = parse(input({ endedAt: "2026-11-14T23:20:00.000Z" }));
-    expect(r.success && "endedAt" in r.data).toBe(false);
-  });
+  test("still going (no end) is fine", () => expect(parse(input({ endedAt: null })).success).toBe(true));
+
+  test("end before start", () =>
+    expect(firstError(input({ endedAt: "2026-11-14T16:00:00.000Z" }))).toBe(
+      "End time must be after the start",
+    ));
 
   test("start in the future", () =>
-    expect(firstError(input({ startedAt: "2026-11-18T19:00:00.000Z" }))).toBe(
+    expect(firstError(input({ startedAt: "2026-11-18T19:00:00.000Z", endedAt: null }))).toBe(
       "Start time can't be in the future",
     ));
 

@@ -7,6 +7,7 @@ import { EpisodeForm } from "./EpisodeForm";
 const initial: Episode = {
   id: "6f1c1c1e-0000-4000-8000-000000000001",
   startedAt: new Date(2026, 10, 14, 9, 0),
+  endedAt: new Date(2026, 10, 14, 15, 20),
   peakPain: 7,
   locations: [],
   symptoms: [],
@@ -15,11 +16,24 @@ const initial: Episode = {
   medications: [],
 };
 
-test("only a start time, no end time or still-going", () => {
-  render(<EpisodeForm initial={initial} usedTriggers={[]} usedMedications={[]} onSave={vi.fn()} />);
+test("start and end times; 'Still going' clears the end", async () => {
+  const user = userEvent.setup();
+  const onSave = vi.fn().mockResolvedValue({ ok: true, id: initial.id });
+  render(<EpisodeForm initial={initial} usedTriggers={[]} usedMedications={[]} onSave={onSave} />);
   expect(screen.getByLabelText("Started")).toBeInTheDocument();
+  expect(screen.getByLabelText("Ended")).toBeInTheDocument();
+  await user.click(screen.getByLabelText("Still going"));
   expect(screen.queryByLabelText("Ended")).toBeNull();
-  expect(screen.queryByText("Still going")).toBeNull();
+  await user.click(screen.getByRole("button", { name: "Save" }));
+  expect(onSave.mock.calls[0][0].endedAt).toBeNull();
+});
+
+test("an ended migraine saves its end time", async () => {
+  const user = userEvent.setup();
+  const onSave = vi.fn().mockResolvedValue({ ok: true, id: initial.id });
+  render(<EpisodeForm initial={initial} usedTriggers={[]} usedMedications={[]} onSave={onSave} />);
+  await user.click(screen.getByRole("button", { name: "Save" }));
+  expect(onSave.mock.calls[0][0].endedAt).toBe(new Date(2026, 10, 14, 15, 20).toISOString());
 });
 
 test("renders all sections", () => {

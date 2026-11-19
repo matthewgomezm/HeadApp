@@ -8,6 +8,7 @@ function ep(startedAt: Date, peakPain: number | null): Episode {
   return {
     id: String(startedAt.getTime()),
     startedAt,
+    endedAt: null,
     peakPain,
     locations: [],
     symptoms: [],

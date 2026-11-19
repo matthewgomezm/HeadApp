@@ -5,6 +5,7 @@ export const sampleEpisodes: Episode[] = [
   {
     id: "sample-3",
     startedAt: new Date(2026, 10, 14, 9, 0),
+    endedAt: new Date(2026, 10, 14, 15, 20),
     peakPain: 7,
     locations: [],
     symptoms: [],
@@ -15,6 +16,7 @@ export const sampleEpisodes: Episode[] = [
   {
     id: "sample-2",
     startedAt: new Date(2026, 10, 3, 17, 30),
+    endedAt: new Date(2026, 10, 4, 1, 0),
     peakPain: 8,
     locations: [],
     symptoms: [],
@@ -25,6 +27,7 @@ export const sampleEpisodes: Episode[] = [
   {
     id: "sample-1",
     startedAt: new Date(2026, 9, 22, 13, 0),
+    endedAt: new Date(2026, 9, 22, 16, 45),
     peakPain: 5,
     locations: [],
     symptoms: [],

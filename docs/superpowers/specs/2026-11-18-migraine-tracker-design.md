@@ -87,12 +87,14 @@ than features.
 - **Stage 1, during a migraine (Home):** big "I have a migraine" button.
   Tap → creates an episode with `started_at = now`, then a single screen of
   large 1–10 pain buttons (optional — can be skipped). Done.
-- **Only the start time is tracked** (decided by Matthew, 2026-11-18): no end
-  time, no "in progress" state, no "It's over" button — ending a migraine was
-  one step too many. After the pain screen Home is back to the big button and
-  the new migraine is the latest card (tap it to add details). A rapid second
-  tap is ignored while the pain screen is opening.
-- **Stage 2, later (episode detail):** editable start time, peak pain,
+- **One button, two presses (Jadyn's request, 2026-11-18):** press when the
+  migraine starts (pain screen follows), press the same button again —
+  now labelled "It's over" with "Started 2:40 PM · 1h 12m so far" above it —
+  when it ends. The duration is end − start, tracked automatically. Pain is
+  asked at the start only. A double tap on "It's over" can't start a new
+  migraine (1 s guard). (This replaced a short-lived start-time-only version.)
+- **Stage 2, later (episode detail):** editable start time, end time (or
+  "Still going"), peak pain,
   location (left / right / both / behind eyes / back of head / forehead),
   symptoms (nausea, vomiting, light sensitivity, sound sensitivity,
   smell sensitivity, dizziness), medications (name, time, helped:
@@ -130,8 +132,8 @@ than features.
 - **Definition** *(builder's call)*: unit is her local calendar day. A day D
   "has the condition" based on that day's `daily_context` (sleep = the night
   ending on D's morning; pressure change = D vs D−1). D "leads to a migraine"
-  if an episode **starts** on D or D+1. (No end times, so no "already in
-  progress" exclusion.)
+  if an episode **starts** on D or D+1. Days on which an episode was already
+  in progress at midnight are excluded from both numerator and denominator.
   Days with missing data for that condition are excluded for that condition.
 - Below a minimum sample size (e.g. fewer than ~5 events on either side) show
   "not enough data yet" instead of a ratio.
@@ -143,7 +145,7 @@ than features.
 
 ### Doctor tab
 - A print-friendly summary for a chosen date range: migraines per month,
-  pain distribution, medication use and how often
+  average/longest duration, pain distribution, medication use and how often
   each helped, top recorded triggers, the strongest measured conditions, and
   a chronological list of episodes.
 - Printed via the browser (Print / Save as PDF). Print styles use a light
@@ -184,8 +186,8 @@ than features.
 - System font stack.
 
 ### Data model (Supabase / Postgres, all tables RLS on `user_id = auth.uid()`)
-- `episodes` — id, user_id, started_at, ended_at (nullable, unused since
-  end times were dropped; kept so no migration is needed), peak_pain
+- `episodes` — id, user_id, started_at, ended_at (null while still going),
+  peak_pain
   (1–10, nullable), locations text[], symptoms text[], triggers text[],
   notes, created_at, updated_at.
 - `medication_doses` — id, episode_id, user_id, name, taken_at, helped

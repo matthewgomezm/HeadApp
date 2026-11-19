@@ -112,11 +112,16 @@ describe("localEpisodes", () => {
   test("returns queued starts, newest first", () => {
     enqueue({ id: "a", patch: { started_at: T0, peak_pain: 6 } }, s);
     enqueue({ id: "b", patch: { started_at: "2026-11-18T15:00:00.000Z" } }, s);
-    enqueue({ id: "c", patch: { peak_pain: 2 } }, s); // pain-only update for a synced episode
+    enqueue({ id: "c", patch: { peak_pain: 2 } }, s); // update for an already-synced episode
     expect(localEpisodes(s)).toEqual([
-      { id: "b", startedAt: new Date("2026-11-18T15:00:00.000Z"), peakPain: null },
-      { id: "a", startedAt: new Date(T0), peakPain: 6 },
+      { id: "b", startedAt: new Date("2026-11-18T15:00:00.000Z"), peakPain: null, endedAt: null },
+      { id: "a", startedAt: new Date(T0), peakPain: 6, endedAt: null },
     ]);
+  });
+
+  test("carries a queued end time", () => {
+    enqueue({ id: "a", patch: { started_at: T0, ended_at: "2026-11-18T16:00:00.000Z" } }, s);
+    expect(localEpisodes(s)[0].endedAt).toEqual(new Date("2026-11-18T16:00:00.000Z"));
   });
 
   test("empty when queue empty", () => expect(localEpisodes(s)).toEqual([]));

@@ -1,4 +1,11 @@
-import { daysSinceLabel, latestEpisode, type Episode } from "@/lib/episodes";
+import {
+  daysSinceLabel,
+  formatDuration,
+  formatTime,
+  latestEpisode,
+  openEpisode,
+  type Episode,
+} from "@/lib/episodes";
 import { METRIC_SEGMENTS, migraineMetricData } from "@/lib/migraine-metrics";
 import { EpisodeCard } from "./EpisodeCard";
 import { Card, CardDescription, CardHeader, CardTitle } from "./ui/card";
@@ -14,6 +21,9 @@ type Props = {
 
 export function HomeScreen({ name, episodes, now, onLog }: Props) {
   const latest = latestEpisode(episodes);
+  const open = openEpisode(episodes);
+  // While one is going, the card shows the migraine before it.
+  const cardEpisode = latestEpisode(episodes.filter((e) => e.id !== open?.id));
   const today = now.toLocaleDateString("en-US", {
     weekday: "short",
     month: "short",
@@ -29,19 +39,28 @@ export function HomeScreen({ name, episodes, now, onLog }: Props) {
             <h1 className="text-[22px] font-semibold leading-tight text-dusk-text">Hi {name}</h1>
           </CardTitle>
           <CardDescription className="text-base text-dusk-text/80">
-            {daysSinceLabel(latest?.startedAt ?? null, now)}
+            {open
+              ? "Migraine in progress"
+              : daysSinceLabel(latest ? (latest.endedAt ?? latest.startedAt) : null, now)}
           </CardDescription>
         </CardHeader>
       </Card>
 
-      <div className="mt-10 mb-4">
-        <LogButton onLog={onLog} />
+      {open ? (
+        <p className="mt-8 text-center text-dusk-accent">
+          {`Started ${formatTime(open.startedAt)} · ${formatDuration(open.startedAt, now)} so far`}
+        </p>
+      ) : null}
+      <div className={open ? "mt-4 mb-4" : "mt-10 mb-4"}>
+        <LogButton onLog={onLog} ongoing={open !== null} />
       </div>
-      <p className="text-center text-sm text-dusk-muted">Details can wait until you feel better</p>
+      <p className="text-center text-sm text-dusk-muted">
+        {open ? "The time is saved for you. Details can wait." : "Details can wait until you feel better"}
+      </p>
 
-      {latest && (
+      {cardEpisode && (
         <section aria-label="Most recent migraine" className="mt-8">
-          <EpisodeCard episode={latest} href={`/episodes/${latest.id}`} />
+          <EpisodeCard episode={cardEpisode} href={`/episodes/${cardEpisode.id}`} />
         </section>
       )}
 

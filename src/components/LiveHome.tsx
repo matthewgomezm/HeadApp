@@ -3,9 +3,10 @@
 import { useRouter } from "next/navigation";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { deserializeEpisode, type SerializedEpisode } from "@/lib/episode-rows";
-import type { Episode } from "@/lib/episodes";
+import { mergeQueued } from "@/lib/episode-merge";
+import { openEpisode } from "@/lib/episodes";
 import { lazyBrowserUpsert } from "@/lib/episode-sync";
-import { enqueue, flush, localEpisodes, type Upsert } from "@/lib/log-queue";
+import { enqueue, flush, type Upsert } from "@/lib/log-queue";
 import { useNow } from "@/lib/use-now";
 import { HomeScreen } from "./HomeScreen";
 import { PainSheet } from "./PainSheet";
@@ -18,24 +19,6 @@ type Props = {
   storage?: Storage;
 };
 
-/** Server episodes plus taps still waiting on this device (so a fresh tap shows immediately). */
-function mergeLocal(server: Episode[], storage: Storage | undefined): Episode[] {
-  const known = new Set(server.map((e) => e.id));
-  const local = localEpisodes(storage)
-    .filter((l) => !known.has(l.id))
-    .map<Episode>((l) => ({
-      id: l.id,
-      startedAt: l.startedAt,
-      peakPain: l.peakPain,
-      locations: [],
-      symptoms: [],
-      triggers: [],
-      notes: "",
-      medications: [],
-    }));
-  return [...local, ...server];
-}
-
 export function LiveHome({ name, initial, upsert: injected, storage }: Props) {
   const router = useRouter();
   const now = useNow();
@@ -44,6 +27,8 @@ export function LiveHome({ name, initial, upsert: injected, storage }: Props) {
   const [version, setVersion] = useState(0); // bump after queue changes
   const [painFor, setPainFor] = useState<string | null>(null);
   const logging = useRef(false); // blocks a second tap landing in the same instant
+  // Time of the last "It's over" tap, to absorb a double tap.
+  const lastToggle = useRef(0);
 
   const sync = useCallback(async () => {
     const { sent } = await flush(upsert, storage);
@@ -67,7 +52,7 @@ export function LiveHome({ name, initial, upsert: injected, storage }: Props) {
 
   // version is read so the list recomputes after enqueue
   const episodes = useMemo(
-    () => (version >= 0 ? mergeLocal(server, storage) : server),
+    () => (version >= 0 ? mergeQueued(server, storage) : server),
     [server, storage, version],
   );
 
@@ -77,7 +62,18 @@ export function LiveHome({ name, initial, upsert: injected, storage }: Props) {
   }
 
   function onLog() {
-    if (logging.current) return;
+    if (logging.current || Date.now() - lastToggle.current < 1000) return;
+    // Read storage directly so the decision uses taps not yet re-rendered.
+    const current = openEpisode(mergeQueued(server, storage));
+    if (current) {
+      // Second press: it's over. The duration is start → now. Guard the next
+      // second so a double tap can't land on the fresh "I have a migraine".
+      // (After a start, the pain screen already covers the button.)
+      lastToggle.current = Date.now();
+      enqueue({ id: current.id, patch: { ended_at: new Date().toISOString() } }, storage);
+      change();
+      return;
+    }
     logging.current = true;
     const id = crypto.randomUUID();
     enqueue({ id, patch: { started_at: new Date().toISOString() } }, storage);

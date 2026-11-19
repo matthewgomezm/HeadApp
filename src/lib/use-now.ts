@@ -3,8 +3,8 @@
 import { useSyncExternalStore } from "react";
 
 // The current time on *her device* (local timezone), or null during server
-// rendering. Refreshes whenever the app returns to the foreground, so a
-// home-screen app left open overnight shows the right "days since".
+// rendering. Refreshes whenever the app returns to the foreground and once a
+// minute, so "days since" and an ongoing migraine's elapsed time stay right.
 let cached: Date | null = null;
 
 function subscribe(onChange: () => void) {
@@ -15,7 +15,12 @@ function subscribe(onChange: () => void) {
     }
   };
   document.addEventListener("visibilitychange", refresh);
-  return () => document.removeEventListener("visibilitychange", refresh);
+  // Once a minute, so "1h 12m so far" stays current. No animation, just a new number.
+  const tick = setInterval(refresh, 60_000);
+  return () => {
+    document.removeEventListener("visibilitychange", refresh);
+    clearInterval(tick);
+  };
 }
 
 function getSnapshot(): Date {

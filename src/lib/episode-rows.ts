@@ -12,6 +12,7 @@ export function rowToEpisode(row: EpisodeRow & { medication_doses: DoseRow[] }):
   return {
     id: row.id,
     startedAt: new Date(row.started_at),
+    endedAt: row.ended_at ? new Date(row.ended_at) : null,
     peakPain: row.peak_pain,
     locations: row.locations,
     symptoms: row.symptoms,
@@ -27,8 +28,9 @@ export function rowToEpisode(row: EpisodeRow & { medication_doses: DoseRow[] }):
 }
 
 /** Plain-JSON form for passing episodes from Server to Client Components. */
-export type SerializedEpisode = Omit<Episode, "startedAt" | "medications"> & {
+export type SerializedEpisode = Omit<Episode, "startedAt" | "endedAt" | "medications"> & {
   startedAt: string;
+  endedAt: string | null;
   medications: { id?: string; name: string; takenAt: string | null; helped: Helped }[];
 };
 
@@ -36,6 +38,7 @@ export function serializeEpisode(e: Episode): SerializedEpisode {
   return {
     ...e,
     startedAt: e.startedAt.toISOString(),
+    endedAt: e.endedAt?.toISOString() ?? null,
     medications: e.medications.map((m) => ({ ...m, takenAt: m.takenAt?.toISOString() ?? null })),
   };
 }
@@ -44,6 +47,7 @@ export function deserializeEpisode(s: SerializedEpisode): Episode {
   return {
     ...s,
     startedAt: new Date(s.startedAt),
+    endedAt: s.endedAt ? new Date(s.endedAt) : null,
     medications: s.medications.map((m) => ({ ...m, takenAt: m.takenAt ? new Date(m.takenAt) : null })),
   };
 }
