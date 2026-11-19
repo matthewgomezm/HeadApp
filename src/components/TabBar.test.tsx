@@ -1,8 +1,13 @@
 import { render, screen } from "@testing-library/react";
-import { expect, test, vi } from "vitest";
+import { beforeEach, expect, test, vi } from "vitest";
 import { TabBar } from "./TabBar";
 
-vi.mock("next/navigation", () => ({ usePathname: () => "/insights" }));
+let pathname = "/insights";
+vi.mock("next/navigation", () => ({ usePathname: () => pathname }));
+
+beforeEach(() => {
+  pathname = "/insights";
+});
 
 test("four tabs with correct hrefs", () => {
   render(<TabBar />);
@@ -21,4 +26,10 @@ test("only the current tab is marked active", () => {
   render(<TabBar />);
   const current = screen.getAllByRole("link").filter((l) => l.getAttribute("aria-current") === "page");
   expect(current.map((l) => l.textContent)).toEqual(["Insights"]);
+});
+
+test("hidden on the login page", () => {
+  pathname = "/login";
+  render(<TabBar />);
+  expect(screen.queryByRole("navigation")).toBeNull();
 });
