@@ -2,6 +2,17 @@ import type { SupabaseClient } from "@supabase/supabase-js";
 import type { Upsert } from "./log-queue";
 import type { Database } from "./supabase/database.types";
 
+let browserUpsert: Upsert | null = null;
+
+/** Upsert using the browser client, created on first use (never during render/prerender). */
+export const lazyBrowserUpsert: Upsert = async (row) => {
+  if (!browserUpsert) {
+    const { createClient } = await import("./supabase/client");
+    browserUpsert = makeUpsert(createClient());
+  }
+  return browserUpsert(row);
+};
+
 /**
  * Sends one queued patch. A patch that carries started_at is upserted by id
  * (idempotent create). A patch without it must be an UPDATE: Postgres checks

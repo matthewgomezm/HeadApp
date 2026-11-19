@@ -83,7 +83,10 @@ export function flush(
 
   const run = (async () => {
     let sent = 0;
-    for (const op of read(storage)) {
+    // Re-read after each send: ops queued mid-flight (pain picked while the
+    // start is still sending) must go out in this same run, since concurrent
+    // callers are handed this promise instead of starting their own.
+    for (let op = read(storage)[0]; op; op = read(storage)[0]) {
       let ok = false;
       try {
         const { error } = await upsert({ id: op.id, ...op.patch });

@@ -3,9 +3,8 @@
 import { useRouter } from "next/navigation";
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { deserializeEpisode, type SerializedEpisode } from "@/lib/episode-rows";
-import { makeUpsert } from "@/lib/episode-sync";
+import { lazyBrowserUpsert } from "@/lib/episode-sync";
 import { enqueue, flush, localOpenEpisode, pending, type Upsert } from "@/lib/log-queue";
-import { createClient } from "@/lib/supabase/client";
 import { useNow } from "@/lib/use-now";
 import { HomeScreen, type OpenEpisode } from "./HomeScreen";
 import { PainSheet } from "./PainSheet";
@@ -37,7 +36,7 @@ export function LiveHome({ name, initial, upsert: injected, storage }: Props) {
   const router = useRouter();
   const now = useNow();
   const episodes = useMemo(() => initial.map(deserializeEpisode), [initial]);
-  const upsert = useMemo(() => injected ?? makeUpsert(createClient()), [injected]);
+  const upsert = injected ?? lazyBrowserUpsert;
   const [version, setVersion] = useState(0); // bump after queue changes
   const [painFor, setPainFor] = useState<string | null>(null);
 

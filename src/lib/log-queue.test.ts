@@ -76,6 +76,26 @@ describe("flush", () => {
     expect(upsert).toHaveBeenCalledTimes(1);
   });
 
+  test("an op queued during an in-flight flush is sent before that flush settles", async () => {
+    enqueue({ id: "a", patch: { started_at: T0 } }, s);
+    let release!: () => void;
+    const gate = new Promise<void>((r) => (release = r));
+    const upsert = vi
+      .fn()
+      .mockImplementationOnce(async () => {
+        await gate;
+        return { error: null };
+      })
+      .mockResolvedValue({ error: null });
+    const first = flush(upsert, s);
+    enqueue({ id: "a", patch: { peak_pain: 6 } }, s); // e.g. pain picked while start is sending
+    const second = flush(upsert, s);
+    release();
+    await Promise.all([first, second]);
+    expect(upsert).toHaveBeenLastCalledWith({ id: "a", peak_pain: 6 });
+    expect(pending(s)).toEqual([]);
+  });
+
   test("patch added while sending is not lost", async () => {
     enqueue({ id: "a", patch: { started_at: T0 } }, s);
     const upsert = vi.fn().mockImplementation(async () => {
@@ -83,7 +103,8 @@ describe("flush", () => {
       return { error: null };
     });
     await flush(upsert, s);
-    expect(pending(s)).toEqual([{ id: "a", patch: { peak_pain: 5 } }]);
+    expect(upsert.mock.calls[1][0]).toEqual({ id: "a", peak_pain: 5 });
+    expect(pending(s)).toEqual([]);
   });
 });
 
