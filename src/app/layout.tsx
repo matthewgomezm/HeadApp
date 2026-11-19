@@ -23,7 +23,7 @@ export const viewport: Viewport = {
 
 export default function RootLayout({ children }: LayoutProps<"/">) {
   return (
-    <html lang="en" className="h-full">
+    <html lang="en" className="h-full dark">
       <body className="min-h-full bg-dusk-bg font-sans text-dusk-text antialiased">
         {children}
         <Suspense fallback={<TabBarView pathname={null} />}>
