@@ -6,7 +6,7 @@ import { serializeEpisode } from "@/lib/episode-rows";
 export default async function HistoryPage() {
   const episodes = await getEpisodes();
   return (
-    <main className="mx-auto max-w-md px-4 pt-[max(1rem,env(safe-area-inset-top))] pb-28">
+    <main className="page max-w-md landscape:max-w-4xl">
       <h1 className="mt-4 text-[22px] font-semibold">History</h1>
       <Link
         href="/episodes/new"

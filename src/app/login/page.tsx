@@ -21,12 +21,16 @@ export default function LoginPage() {
   }
 
   return (
-    <main className="flex min-h-svh flex-col items-center justify-center px-4 pt-[env(safe-area-inset-top)] pb-[env(safe-area-inset-bottom)]">
-      <div className="mb-3 flex size-16 items-center justify-center rounded-2xl border border-dusk-fill bg-dusk-surface">
-        <PersonIcon data-testid="login-icon" aria-hidden="true" className="size-10 text-dusk-accent" />
+    <main className="flex min-h-svh flex-col items-center justify-center pt-[max(1rem,env(safe-area-inset-top))] pr-[max(1rem,env(safe-area-inset-right))] pb-[max(1rem,env(safe-area-inset-bottom))] pl-[max(1rem,env(safe-area-inset-left))] landscape:flex-row landscape:gap-12">
+      <div className="flex flex-col items-center">
+        <div className="mb-3 flex size-16 items-center justify-center rounded-2xl border border-dusk-fill bg-dusk-surface">
+          <PersonIcon data-testid="login-icon" aria-hidden="true" className="size-10 text-dusk-accent" />
+        </div>
+        <h1 className="mb-6 text-[22px] font-semibold text-dusk-text landscape:mb-0">Migraine Tracker</h1>
       </div>
-      <h1 className="mb-6 text-[22px] font-semibold text-dusk-text">Migraine Tracker</h1>
-      <LoginForm onSignIn={signIn} />
+      <div className="w-full max-w-sm">
+        <LoginForm onSignIn={signIn} />
+      </div>
     </main>
   );
 }

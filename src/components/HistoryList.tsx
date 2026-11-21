@@ -82,7 +82,7 @@ export function HistoryList({ initial }: { initial: SerializedEpisode[] }) {
       {groupByMonth(episodes).map((g) => (
         <section key={g.label} className="mt-4">
           <h2 className="mb-3 text-sm font-semibold uppercase tracking-wide text-dusk-muted">{g.label}</h2>
-          <ul className="space-y-3">
+          <ul className="grid gap-3 landscape:grid-cols-2">
             {g.items.map((e) =>
               selecting ? (
                 <li key={e.id}>

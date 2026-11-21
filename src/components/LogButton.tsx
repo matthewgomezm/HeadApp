@@ -11,7 +11,7 @@ export function LogButton({ onLog, ongoing = false }: Props) {
     <button
       type="button"
       onClick={onLog}
-      className="mx-auto flex size-[170px] flex-col items-center justify-center rounded-full bg-dusk-fill text-dusk-accent ring-[10px] ring-dusk-surface focus-visible:outline-2 focus-visible:outline-offset-[14px] focus-visible:outline-dusk-accent active:bg-dusk-surface"
+      className="mx-auto flex size-[170px] short:size-[130px] flex-col items-center justify-center rounded-full bg-dusk-fill text-dusk-accent ring-[10px] ring-dusk-surface focus-visible:outline-2 focus-visible:outline-offset-[14px] focus-visible:outline-dusk-accent active:bg-dusk-surface"
     >
       <span className="text-[19px] font-semibold leading-tight">
         {ongoing ? "It's over" : "I have a migraine"}

@@ -6,14 +6,16 @@ export default function Loading() {
     <main
       aria-busy="true"
       aria-label="Loading"
-      className="mx-auto max-w-md px-4 pt-[max(1rem,env(safe-area-inset-top))] pb-28"
+      className="page max-w-md landscape:max-w-4xl"
     >
       <Skeleton className="mt-4 h-7 w-28" />
       <Skeleton className="mt-4 h-12 w-full rounded-xl" />
       <Skeleton className="mt-8 h-3 w-28" />
-      {[0, 1, 2].map((i) => (
-        <Skeleton key={i} className="mt-3 h-20 w-full rounded-2xl" />
-      ))}
+      <div className="mt-3 grid gap-3 landscape:grid-cols-2">
+        {[0, 1, 2, 3].map((i) => (
+          <Skeleton key={i} className="h-20 w-full rounded-2xl" />
+        ))}
+      </div>
     </main>
   );
 }

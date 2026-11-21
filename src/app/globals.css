@@ -4,6 +4,24 @@
 
 @custom-variant dark (&:is(.dark *));
 
+/* A phone on its side (~390px tall): tighten vertical spacing. */
+@custom-variant short (@media (max-height: 500px));
+
+/*
+ * Page margins for every screen. Each side is at least 1rem and never under
+ * the notch / rounded corners, which move to the left or right in landscape.
+ * The bottom leaves room for the fixed tab bar.
+ */
+@utility page {
+  margin-inline: auto;
+  width: 100%;
+  padding-top: max(1rem, env(safe-area-inset-top));
+  padding-right: max(1rem, env(safe-area-inset-right));
+  /* clears the fixed tab bar, which itself grows by the home-indicator inset */
+  padding-bottom: calc(7rem + env(safe-area-inset-bottom));
+  padding-left: max(1rem, env(safe-area-inset-left));
+}
+
 /* Dusk palette: dark, warm, low-contrast. Never use pure-light/pure-dark extremes or bright blue. */
 @theme {
   --color-dusk-bg: #1d1a17;

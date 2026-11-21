@@ -35,7 +35,9 @@ export function HomeScreen({ name, episodes, now, onLog, confirmation }: Props) 
   });
 
   return (
-    <main className="mx-auto max-w-md px-4 pt-[max(1rem,env(safe-area-inset-top))] pb-28">
+    <main className="page max-w-md landscape:grid landscape:max-w-4xl landscape:grid-cols-2 landscape:items-start landscape:gap-x-8">
+      {/* Left in landscape: who/when, and the big button. */}
+      <div>
       <Card className="mt-4 rounded-2xl border border-dusk-fill bg-dusk-surface ring-0">
         <CardHeader className="gap-1.5">
           <CardDescription className="text-sm text-dusk-muted">{today}</CardDescription>
@@ -54,11 +56,11 @@ export function HomeScreen({ name, episodes, now, onLog, confirmation }: Props) 
       </Card>
 
       {open ? (
-        <p className="mt-8 text-center text-dusk-accent">
+        <p className="mt-8 text-center text-dusk-accent short:mt-4">
           {`Started ${formatTime(open.startedAt)} · ${formatDuration(open.startedAt, now)} so far`}
         </p>
       ) : null}
-      <div className={open ? "mt-4 mb-4" : "mt-10 mb-4"}>
+      <div className={open ? "mt-4 mb-4 short:mt-3 short:mb-3" : "mt-10 mb-4 short:mt-5 short:mb-3"}>
         <LogButton onLog={onLog} ongoing={open !== null} />
       </div>
       <div className="flex min-h-6 items-center justify-center">
@@ -70,9 +72,12 @@ export function HomeScreen({ name, episodes, now, onLog, confirmation }: Props) 
           </p>
         )}
       </div>
+      </div>
 
+      {/* Right in landscape: the latest migraine and the totals. */}
+      <div>
       {cardEpisode && (
-        <section aria-label="Most recent migraine" className="mt-8">
+        <section aria-label="Most recent migraine" className="mt-8 landscape:mt-4">
           <EpisodeCard episode={cardEpisode} href={`/episodes/${cardEpisode.id}`} />
         </section>
       )}
@@ -89,6 +94,7 @@ export function HomeScreen({ name, episodes, now, onLog, confirmation }: Props) 
           upIsGood={false}
         />
       </section>
+      </div>
     </main>
   );
 }

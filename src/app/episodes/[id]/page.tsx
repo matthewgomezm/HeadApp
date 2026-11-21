@@ -10,7 +10,7 @@ export default async function EpisodePage({ params }: { params: Promise<{ id: st
   if (!episode) notFound();
 
   return (
-    <main className="mx-auto max-w-md px-4 pt-[max(1rem,env(safe-area-inset-top))] pb-28">
+    <main className="page max-w-md landscape:max-w-2xl">
       <Link href="/history" className="mt-2 inline-flex min-h-12 items-center text-dusk-muted">
         ‹ History
       </Link>

@@ -8,14 +8,14 @@ export function PainSheet({ onPick, onSkip }: Props) {
       role="dialog"
       aria-modal="true"
       aria-labelledby="pain-title"
-      className="fixed inset-0 z-20 flex flex-col justify-center bg-dusk-bg px-4 pt-[env(safe-area-inset-top)] pb-[max(1.5rem,env(safe-area-inset-bottom))]"
+      className="fixed inset-0 z-20 flex flex-col justify-center bg-dusk-bg pr-[max(1rem,env(safe-area-inset-right))] pl-[max(1rem,env(safe-area-inset-left))] pt-[env(safe-area-inset-top)] pb-[max(1.5rem,env(safe-area-inset-bottom))]"
     >
-      <div className="mx-auto w-full max-w-md">
+      <div className="mx-auto w-full max-w-md short:max-w-2xl">
         <h2 id="pain-title" className="text-center text-[22px] font-semibold">
           How bad is it?
         </h2>
         <p className="mt-1 text-center text-sm text-dusk-muted">1 is mild, 10 is the worst</p>
-        <div className="mt-8 grid grid-cols-5 gap-3">
+        <div className="mt-8 grid grid-cols-5 gap-3 short:mt-4 short:grid-cols-10 short:gap-2">
           {Array.from({ length: 10 }, (_, i) => i + 1).map((n) => (
             <button
               key={n}
@@ -30,7 +30,7 @@ export function PainSheet({ onPick, onSkip }: Props) {
         <button
           type="button"
           onClick={onSkip}
-          className="mt-8 min-h-12 w-full text-dusk-muted focus-visible:outline-2 focus-visible:outline-dusk-accent"
+          className="mt-8 min-h-12 w-full text-dusk-muted short:mt-3 focus-visible:outline-2 focus-visible:outline-dusk-accent"
         >
           Skip
         </button>
