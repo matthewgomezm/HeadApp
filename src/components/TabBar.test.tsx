@@ -34,6 +34,11 @@ test("episode detail pages keep History active", () => {
   expect(screen.getByRole("link", { name: "History" })).toHaveAttribute("aria-current", "page");
 });
 
+test("the day/night switch sits in the tab bar", () => {
+  render(<TabBar />);
+  expect(screen.getByRole("button", { name: "Day or night colours" })).toBeInTheDocument();
+});
+
 test("hidden on the login page", () => {
   pathname = "/login";
   render(<TabBar />);

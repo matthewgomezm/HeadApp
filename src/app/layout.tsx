@@ -2,6 +2,7 @@ import type { Metadata, Viewport } from "next";
 import { Suspense } from "react";
 import { TabBar, TabBarPlaceholder } from "@/components/TabBar";
 import { dusk } from "@/lib/theme";
+import { THEME_BOOT_SCRIPT } from "@/lib/theme-pref";
 import "./globals.css";
 
 export const metadata: Metadata = {
@@ -23,8 +24,19 @@ export const viewport: Viewport = {
 
 export default function RootLayout({ children }: LayoutProps<"/">) {
   return (
-    <html lang="en" className="h-full dark">
+    // Night (dark) by default; the boot script switches to day before paint if
+    // she chose it, so the class can differ from the server render.
+    <html lang="en" className="h-full dark" suppressHydrationWarning>
+      <head>
+        <script dangerouslySetInnerHTML={{ __html: THEME_BOOT_SCRIPT }} />
+      </head>
       <body className="min-h-full bg-dusk-bg font-sans text-dusk-text antialiased">
+        {/* Behind the iOS status bar, whose text stays white in a home-screen app. */}
+        <div
+          aria-hidden="true"
+          data-print="hide"
+          className="fixed inset-x-0 top-0 z-30 h-[env(safe-area-inset-top)] bg-[#191714]"
+        />
         {children}
         <Suspense fallback={<TabBarPlaceholder />}>
           <TabBar />

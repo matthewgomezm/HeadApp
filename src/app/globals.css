@@ -22,26 +22,35 @@
   padding-left: max(1rem, env(safe-area-inset-left));
 }
 
-/* Dusk palette: dark, warm, low-contrast. Never use pure-light/pure-dark extremes or bright blue. */
-@theme {
-  --color-dusk-bg: #1d1a17;
-  --color-dusk-surface: #26221e;
-  --color-dusk-fill: #3a2f25;
-  --color-dusk-accent: #e3c49f;
-  --color-dusk-text: #d9d0c3;
-  --color-dusk-muted: #8f857a;
-  --color-dusk-tabbar: #191714;
+/*
+ * Dusk palette, in two themes: night (.dark on <html>, the default) and day
+ * (warm light). Low contrast either way; never pure-light/pure-dark extremes
+ * or bright blue. Tailwind's dusk-* colours follow the theme variables.
+ */
+@theme inline {
+  --color-dusk-bg: var(--dusk-bg);
+  --color-dusk-surface: var(--dusk-surface);
+  --color-dusk-fill: var(--dusk-fill);
+  --color-dusk-accent: var(--dusk-accent);
+  --color-dusk-text: var(--dusk-text);
+  --color-dusk-muted: var(--dusk-muted);
+  --color-dusk-tabbar: var(--dusk-tabbar);
+}
 
+@theme {
   --font-sans: -apple-system, BlinkMacSystemFont, "SF Pro Text", system-ui, sans-serif;
 }
 
 html,
 body {
-  background: var(--color-dusk-bg);
-  color: var(--color-dusk-text);
+  background: var(--dusk-bg);
+  color: var(--dusk-text);
   font-size: 16px;
-  color-scheme: dark;
   -webkit-tap-highlight-color: transparent;
+  /* switching day/night eases the colours over (off with Reduce Motion) */
+  transition:
+    background-color 0.4s ease,
+    color 0.4s ease;
 }
 
 @media (prefers-reduced-motion: reduce) {
@@ -96,39 +105,67 @@ body {
 }
 
 :root {
-  /* shadcn / Kokonut UI variables mapped onto Dusk (see shadcnTokens in src/lib/theme.ts). */
-  --background: #1d1a17;
-  --foreground: #d9d0c3;
-  --card: #26221e;
-  --card-foreground: #d9d0c3;
-  --popover: #26221e;
-  --popover-foreground: #d9d0c3;
-  --primary: #3a2f25;
-  --primary-foreground: #e3c49f;
-  --secondary: #26221e;
-  --secondary-foreground: #d9d0c3;
-  --muted: #26221e;
-  --muted-foreground: #8f857a;
-  --accent: #3a2f25;
-  --accent-foreground: #e3c49f;
-  --destructive: #c98a6b;
-  --border: #3a2f25;
-  --input: #3a2f25;
-  --ring: #e3c49f;
-  --chart-1: #e3c49f;
-  --chart-2: #c9a27a;
-  --chart-3: #a8825f;
-  --chart-4: #8f857a;
-  --chart-5: #6b5a49;
-  --sidebar: #191714;
-  --sidebar-foreground: #d9d0c3;
-  --sidebar-primary: #3a2f25;
-  --sidebar-primary-foreground: #e3c49f;
-  --sidebar-accent: #26221e;
-  --sidebar-accent-foreground: #e3c49f;
-  --sidebar-border: #3a2f25;
-  --sidebar-ring: #e3c49f;
+  /* Day (warm light). shadcn / Kokonut variables follow the theme (see src/lib/theme.ts). */
+  --dusk-bg: #f4ede3;
+  --dusk-surface: #fbf6ef;
+  --dusk-fill: #e9dccb;
+  --dusk-accent: #8a5a2b;
+  --dusk-text: #3b322a;
+  --dusk-muted: #7a6d60;
+  --dusk-tabbar: #ece2d4;
+  --dusk-destructive: #a4553a;
+  --dusk-chart-2: #a77b4f;
+  --dusk-chart-3: #c49a6c;
+  --dusk-chart-5: #d8c2a6;
+  color-scheme: light;
+  --background: var(--dusk-bg);
+  --foreground: var(--dusk-text);
+  --card: var(--dusk-surface);
+  --card-foreground: var(--dusk-text);
+  --popover: var(--dusk-surface);
+  --popover-foreground: var(--dusk-text);
+  --primary: var(--dusk-fill);
+  --primary-foreground: var(--dusk-accent);
+  --secondary: var(--dusk-surface);
+  --secondary-foreground: var(--dusk-text);
+  --muted: var(--dusk-surface);
+  --muted-foreground: var(--dusk-muted);
+  --accent: var(--dusk-fill);
+  --accent-foreground: var(--dusk-accent);
+  --destructive: var(--dusk-destructive);
+  --border: var(--dusk-fill);
+  --input: var(--dusk-fill);
+  --ring: var(--dusk-accent);
+  --chart-1: var(--dusk-accent);
+  --chart-2: var(--dusk-chart-2);
+  --chart-3: var(--dusk-chart-3);
+  --chart-4: var(--dusk-muted);
+  --chart-5: var(--dusk-chart-5);
+  --sidebar: var(--dusk-tabbar);
+  --sidebar-foreground: var(--dusk-text);
+  --sidebar-primary: var(--dusk-fill);
+  --sidebar-primary-foreground: var(--dusk-accent);
+  --sidebar-accent: var(--dusk-surface);
+  --sidebar-accent-foreground: var(--dusk-accent);
+  --sidebar-border: var(--dusk-fill);
+  --sidebar-ring: var(--dusk-accent);
   --radius: 0.625rem;
+}
+
+.dark {
+  /* Night (Dusk), the default. */
+  --dusk-bg: #1d1a17;
+  --dusk-surface: #26221e;
+  --dusk-fill: #3a2f25;
+  --dusk-accent: #e3c49f;
+  --dusk-text: #d9d0c3;
+  --dusk-muted: #8f857a;
+  --dusk-tabbar: #191714;
+  --dusk-destructive: #c98a6b;
+  --dusk-chart-2: #c9a27a;
+  --dusk-chart-3: #a8825f;
+  --dusk-chart-5: #6b5a49;
+  color-scheme: dark;
 }
 
 @layer base {
@@ -145,13 +182,15 @@ body {
 /* Printing Insights for her doctor: light paper, every advice topic shown
    (print-only copy), no navigation or buttons. */
 @media print {
-  :root {
-    --color-dusk-bg: #fbf6ef;
-    --color-dusk-surface: #fbf6ef;
-    --color-dusk-fill: #e9dccb;
-    --color-dusk-accent: #6b4a2a;
-    --color-dusk-text: #2b241e;
-    --color-dusk-muted: #5f554b;
+  :root,
+  .dark {
+    --dusk-bg: #fbf6ef;
+    --dusk-surface: #fbf6ef;
+    --dusk-fill: #e9dccb;
+    --dusk-accent: #6b4a2a;
+    --dusk-text: #2b241e;
+    --dusk-muted: #5f554b;
+    --dusk-tabbar: #fbf6ef;
   }
   html,
   body {

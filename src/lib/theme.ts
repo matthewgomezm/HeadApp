@@ -9,41 +9,52 @@ export const dusk = {
   tabbar: "#191714",
 } as const;
 
+/** Day: warm light (chosen over pure white, 2026-11-20). Mirrors :root in globals.css. */
+export const dayPalette = {
+  bg: "#f4ede3",
+  surface: "#fbf6ef",
+  fill: "#e9dccb",
+  accent: "#8a5a2b",
+  text: "#3b322a",
+  muted: "#7a6d60",
+  tabbar: "#ece2d4",
+} as const;
+
 /**
- * shadcn/ui (and Kokonut UI) color variables, mapped onto Dusk.
- * Mirrors the :root block in globals.css. Solid "primary" buttons use the
- * calm fill with amber text, like the big log button; never bright amber.
+ * shadcn/ui (and Kokonut UI) color variables, mapped onto the theme variables
+ * (--dusk-*, which change between day and night). Solid "primary" buttons use
+ * the calm fill with accent text, like the big log button.
  */
 export const shadcnTokens = {
-  background: dusk.bg,
-  foreground: dusk.text,
-  card: dusk.surface,
-  "card-foreground": dusk.text,
-  popover: dusk.surface,
-  "popover-foreground": dusk.text,
-  primary: dusk.fill,
-  "primary-foreground": dusk.accent,
-  secondary: dusk.surface,
-  "secondary-foreground": dusk.text,
-  muted: dusk.surface,
-  "muted-foreground": dusk.muted,
-  accent: dusk.fill,
-  "accent-foreground": dusk.accent,
-  destructive: "#c98a6b", // muted terracotta, not alarm red
-  border: dusk.fill,
-  input: dusk.fill,
-  ring: dusk.accent,
-  "chart-1": dusk.accent,
-  "chart-2": "#c9a27a",
-  "chart-3": "#a8825f",
-  "chart-4": dusk.muted,
-  "chart-5": "#6b5a49",
-  sidebar: dusk.tabbar,
-  "sidebar-foreground": dusk.text,
-  "sidebar-primary": dusk.fill,
-  "sidebar-primary-foreground": dusk.accent,
-  "sidebar-accent": dusk.surface,
-  "sidebar-accent-foreground": dusk.accent,
-  "sidebar-border": dusk.fill,
-  "sidebar-ring": dusk.accent,
+  background: "var(--dusk-bg)",
+  foreground: "var(--dusk-text)",
+  card: "var(--dusk-surface)",
+  "card-foreground": "var(--dusk-text)",
+  popover: "var(--dusk-surface)",
+  "popover-foreground": "var(--dusk-text)",
+  primary: "var(--dusk-fill)",
+  "primary-foreground": "var(--dusk-accent)",
+  secondary: "var(--dusk-surface)",
+  "secondary-foreground": "var(--dusk-text)",
+  muted: "var(--dusk-surface)",
+  "muted-foreground": "var(--dusk-muted)",
+  accent: "var(--dusk-fill)",
+  "accent-foreground": "var(--dusk-accent)",
+  destructive: "var(--dusk-destructive)",
+  border: "var(--dusk-fill)",
+  input: "var(--dusk-fill)",
+  ring: "var(--dusk-accent)",
+  "chart-1": "var(--dusk-accent)",
+  "chart-2": "var(--dusk-chart-2)",
+  "chart-3": "var(--dusk-chart-3)",
+  "chart-4": "var(--dusk-muted)",
+  "chart-5": "var(--dusk-chart-5)",
+  sidebar: "var(--dusk-tabbar)",
+  "sidebar-foreground": "var(--dusk-text)",
+  "sidebar-primary": "var(--dusk-fill)",
+  "sidebar-primary-foreground": "var(--dusk-accent)",
+  "sidebar-accent": "var(--dusk-surface)",
+  "sidebar-accent-foreground": "var(--dusk-accent)",
+  "sidebar-border": "var(--dusk-fill)",
+  "sidebar-ring": "var(--dusk-accent)",
 } as const;
