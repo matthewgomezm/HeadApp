@@ -143,13 +143,10 @@ than features.
 - Charts: monthly migraine count, calendar heatmap (migraine days by pain),
   a timeline overlaying pressure and sleep with migraine markers.
 
-### Doctor tab
-- A print-friendly summary for a chosen date range: migraines per month,
-  average/longest duration, pain distribution, medication use and how often
-  each helped, top recorded triggers, the strongest measured conditions, and
-  a chronological list of episodes.
-- Printed via the browser (Print / Save as PDF). Print styles use a light
-  background for paper, the screen view stays Dusk.
+### Doctor tab — removed (2026-11-20)
+- Folded into Insights (see `2026-11-20-insights-design.md`): her patterns,
+  what's helped, and sourced advice, printable for her doctor. There is no
+  separate Doctor tab or route.
 
 ### Offline logging *(builder's call)*
 - The one-tap log must not fail on bad signal. The tap is saved to
@@ -171,7 +168,7 @@ than features.
   Weather is backfilled from Open-Meteo's historical API for the same range.
 
 ### Navigation
-- Bottom tab bar: **Home · History · Insights · Doctor**. Settings reached
+- Bottom tab bar: **Home · History · Insights**. Settings reached
   from a small icon on Home (home location, medications list, trigger list,
   Shortcut token, sign out).
 
@@ -216,7 +213,7 @@ than features.
 2. Supabase + email/password auth, episodes: one-tap log with pain, detail
    edit, History list.
 3. Weather cron + Settings home location; Insights charts and likelihoods.
-4. Doctor summary page with print styles.
+4. ~~Doctor summary page~~ — folded into Insights (2026-11-20).
 5. Shortcut ingest endpoint + token + setup guide; cycle tracking.
 6. Later: optional LLM summary (below).
 
