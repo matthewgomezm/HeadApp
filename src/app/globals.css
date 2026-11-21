@@ -142,3 +142,31 @@ body {
     @apply font-sans;
   }
 }
+/* Printing Insights for her doctor: light paper, every advice topic shown
+   (print-only copy), no navigation or buttons. */
+@media print {
+  :root {
+    --color-dusk-bg: #fbf6ef;
+    --color-dusk-surface: #fbf6ef;
+    --color-dusk-fill: #e9dccb;
+    --color-dusk-accent: #6b4a2a;
+    --color-dusk-text: #2b241e;
+    --color-dusk-muted: #5f554b;
+  }
+  html,
+  body {
+    background: #fbf6ef;
+  }
+  [data-print="hide"] {
+    display: none !important;
+  }
+  [data-print="only"] {
+    display: block !important;
+  }
+  [data-print="screen-only"] {
+    display: none !important;
+  }
+  .page {
+    padding-bottom: 0;
+  }
+}

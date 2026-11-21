@@ -11,17 +11,15 @@ beforeEach(() => {
   pathname = "/insights";
 });
 
-test("four tabs with correct hrefs", () => {
+test("three tabs — Home, History, Insights; no Doctor tab", () => {
   render(<TabBar />);
-  const expected = [
+  const links = screen.getAllByRole("link");
+  expect(links.map((l) => [l.textContent, l.getAttribute("href")])).toEqual([
     ["Home", "/"],
     ["History", "/history"],
     ["Insights", "/insights"],
-    ["Doctor", "/doctor"],
-  ];
-  for (const [name, href] of expected) {
-    expect(screen.getByRole("link", { name })).toHaveAttribute("href", href);
-  }
+  ]);
+  expect(screen.queryByRole("link", { name: "Doctor" })).toBeNull();
 });
 
 test("only the current tab is marked active", () => {

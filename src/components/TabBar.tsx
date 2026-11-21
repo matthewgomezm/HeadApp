@@ -7,7 +7,6 @@ const TABS = {
   "/": { name: "Home" },
   "/history": { name: "History" },
   "/insights": { name: "Insights" },
-  "/doctor": { name: "Doctor" },
 };
 
 /** Bottom bar: Kokonut's split nav, recolored to Dusk, above the iPhone home indicator. */
@@ -15,7 +14,7 @@ export function TabBar() {
   const pathname = usePathname();
   if (pathname.startsWith("/login")) return null;
   return (
-    <div className="fixed inset-x-0 bottom-0 bg-dusk-tabbar pr-[env(safe-area-inset-right)] pb-[env(safe-area-inset-bottom)] pl-[env(safe-area-inset-left)]">
+    <div data-print="hide" className="fixed inset-x-0 bottom-0 bg-dusk-tabbar pr-[env(safe-area-inset-right)] pb-[env(safe-area-inset-bottom)] pl-[env(safe-area-inset-left)]">
       <MorphicNavbar
         items={TABS}
         // Episode detail/new pages belong to History.
