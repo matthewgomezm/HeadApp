@@ -172,7 +172,7 @@ export const ADVICE_TOPICS: AdviceTopic[] = [
     tips: [
       "See a GP if migraines are severe, getting worse, lasting longer, happening more than once a week, or hard to control.",
       "Get an urgent appointment (NHS 111 in the UK) if an attack lasts more than 72 hours, an aura lasts over an hour, or you're pregnant or have just had a baby.",
-      "Call emergency services for: a sudden, extremely painful headache; trouble speaking or remembering; loss of vision or blurred or double vision; drowsiness or confusion; a seizure; a very high temperature; weakness on one side of the body or face; or a recent head injury.",
+      "Call emergency services for: a sudden, extremely painful headache; trouble speaking or remembering; loss of vision or blurred or double vision; drowsiness or confusion; a seizure; a very high temperature, a stiff neck or a rash; weakness or numbness in an arm or on one side of the body or face; or a recent head injury.",
     ],
     sources: [NHS],
   },

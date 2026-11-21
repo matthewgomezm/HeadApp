@@ -98,3 +98,11 @@ test("a print-only copy lists every topic's tips (closed accordions don't print)
   expect(printed).toHaveTextContent(/Relaxation techniques/);
   expect(printed).toHaveTextContent(/Call emergency services/);
 });
+
+test("a medication with no 'did it help' answers says not rated yet, with no bar", () => {
+  view([ep(2, { medications: med("unknown") })]);
+  const logged = screen.getByRole("region", { name: "What you've logged" });
+  const row = within(logged).getByText("Sumatriptan").closest("li")!;
+  expect(row).toHaveTextContent("not rated yet");
+  expect(within(row).queryByRole("progressbar")).toBeNull();
+});

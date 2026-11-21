@@ -43,7 +43,7 @@ test("each trigger she can pick maps to a topic", () => {
 test("'see a doctor' covers the urgent warning signs", () => {
   const doc = ADVICE_TOPICS.find((t) => t.id === "see-a-doctor")!;
   const text = doc.tips.join(" ").toLowerCase();
-  for (const sign of ["sudden", "speaking", "vision", "weakness", "seizure", "72 hours"]) {
+  for (const sign of ["sudden", "speaking", "vision", "weakness", "numbness", "arm", "stiff neck", "rash", "seizure", "72 hours"]) {
     expect(text).toContain(sign);
   }
 });

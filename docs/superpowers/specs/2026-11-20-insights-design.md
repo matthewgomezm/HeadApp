@@ -37,7 +37,8 @@ she can show (or print) Insights to her doctor instead. (Matthew, 2026-11-20.)
   bar is).
 - **Night = today's Dusk palette (default).** **Day = warm light**, chosen by
   Matthew over pure white: bg `#f4ede3`, surface `#fbf6ef`, fill `#e9dccb`,
-  accent `#8a5a2b`, text `#3b322a`, muted `#7a6d60`, tabbar `#ece2d4`,
+  accent `#7c4f24`, text `#3b322a`, muted `#6c6054`, tabbar `#ece2d4`,
+  (accent/muted darkened from #8a5a2b/#7a6d60 after review, for WCAG AA)
   destructive `#a4553a`. Still no pure white or black.
 - Implemented with the `dark` class on `<html>` (night) vs none (day); all
   Dusk tokens become CSS variables that change with it, so every screen and

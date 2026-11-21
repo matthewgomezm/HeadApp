@@ -12,7 +12,7 @@
 
 ## Global Constraints
 
-- Night palette = existing Dusk hexes; Day: bg `#f4ede3`, surface `#fbf6ef`, fill `#e9dccb`, accent `#8a5a2b`, text `#3b322a`, muted `#7a6d60`, tabbar `#ece2d4`, destructive `#a4553a`. No pure white/black in `globals.css`.
+- Night palette = existing Dusk hexes; Day: bg `#f4ede3`, surface `#fbf6ef`, fill `#e9dccb`, accent `#7c4f24`, text `#3b322a`, muted `#6c6054`, tabbar `#ece2d4`, destructive `#a4553a`. No pure white/black in `globals.css`.
 - Default theme is night; storage key `mt.theme` with values `"day" | "night"`.
 - ≥48px tap targets, 16px text in inputs, no looping motion; Reduce Motion disables reveal/accordion animation.
 - Advice: only from NHS `https://www.nhs.uk/conditions/migraine/`, AMF `https://americanmigrainefoundation.org/resource-library/top-10-migraine-triggers/`, AMF `https://americanmigrainefoundation.org/resource-library/lifestyle-changes-for-migraine/`; paraphrased; disclaimer "General information, not medical advice."

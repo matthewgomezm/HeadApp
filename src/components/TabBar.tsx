@@ -16,7 +16,8 @@ export function TabBar() {
   if (pathname.startsWith("/login")) return null;
   return (
     <div data-print="hide" className="fixed inset-x-0 bottom-0 bg-dusk-tabbar pr-[env(safe-area-inset-right)] pb-[env(safe-area-inset-bottom)] pl-[env(safe-area-inset-left)]">
-      <div className="relative">
+      {/* Right padding reserves the switch's spot, so the tabs never run under it. */}
+      <div data-slot="tabbar-row" className="relative pr-16">
         <MorphicNavbar
           items={TABS}
           // Episode detail/new pages belong to History.

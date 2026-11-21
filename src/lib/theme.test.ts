@@ -27,9 +27,9 @@ test("day palette is the warm light one Matthew picked", () => {
     bg: "#f4ede3",
     surface: "#fbf6ef",
     fill: "#e9dccb",
-    accent: "#8a5a2b",
+    accent: "#7c4f24",
     text: "#3b322a",
-    muted: "#7a6d60",
+    muted: "#6c6054",
     tabbar: "#ece2d4",
   });
 });

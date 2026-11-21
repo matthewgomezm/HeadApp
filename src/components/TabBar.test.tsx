@@ -57,3 +57,9 @@ test("split nav is recolored to Dusk (no zinc/orange/white leftovers)", () => {
   expect(src).not.toMatch(/zinc-|orange-|text-white|bg-white/);
   expect(src).toMatch(/dusk-accent/);
 });
+
+test("the nav leaves room for the switch so they can't overlap", () => {
+  render(<TabBar />);
+  const nav = screen.getByRole("navigation");
+  expect(nav.closest('[data-slot="tabbar-row"]')).toHaveClass("pr-16");
+});

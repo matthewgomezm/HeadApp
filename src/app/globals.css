@@ -109,14 +109,14 @@ body {
   --dusk-bg: #f4ede3;
   --dusk-surface: #fbf6ef;
   --dusk-fill: #e9dccb;
-  --dusk-accent: #8a5a2b;
+  --dusk-accent: #7c4f24;
   --dusk-text: #3b322a;
-  --dusk-muted: #7a6d60;
+  --dusk-muted: #6c6054;
   --dusk-tabbar: #ece2d4;
   --dusk-destructive: #a4553a;
   --dusk-chart-2: #a77b4f;
-  --dusk-chart-3: #c49a6c;
-  --dusk-chart-5: #d8c2a6;
+  --dusk-chart-3: #a98663;
+  --dusk-chart-5: #9d8466;
   color-scheme: light;
   --background: var(--dusk-bg);
   --foreground: var(--dusk-text);

@@ -99,9 +99,13 @@ export function InsightsView({ initial }: { initial: SerializedEpisode[] }) {
                 <li key={m.name}>
                   <div className="flex justify-between gap-3">
                     <span className="break-words">{m.name}</span>
-                    <span className="shrink-0 text-sm text-dusk-muted">{helpedText(m)}</span>
+                    <span className="shrink-0 text-sm text-dusk-muted">
+                      {m.rated ? helpedText(m) : "not rated yet"}
+                    </span>
                   </div>
-                  <Progress value={m.score * 100} aria-label={`${m.name}: helped score ${Math.round(m.score * 100)}%`} className="mt-1.5" />
+                  {m.rated > 0 && (
+                    <Progress value={m.score * 100} aria-label={`${m.name}: helped score ${Math.round(m.score * 100)}%`} className="mt-1.5" />
+                  )}
                 </li>
               ))}
             </ul>
