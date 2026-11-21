@@ -1,8 +1,10 @@
 import { render, screen } from "@testing-library/react";
-import { describe, expect, test } from "vitest";
+import { describe, expect, test, vi } from "vitest";
 import type { Episode } from "@/lib/episodes";
 import { sampleEpisodes } from "@/lib/sample-data";
 import { HomeScreen } from "./HomeScreen";
+
+vi.mock("next/navigation", () => ({ useRouter: () => ({ replace: vi.fn(), refresh: vi.fn() }) }));
 
 const now = new Date(2026, 10, 18, 10, 0);
 
@@ -41,6 +43,12 @@ describe("HomeScreen", () => {
     expect(card).toHaveTextContent("Wed, Nov 18");
     expect(card).toHaveTextContent("4 days since your last migraine");
     expect(card).not.toContainElement(screen.getByRole("button", { name: /I have a migraine/ }));
+  });
+
+  test("Sign out is in the header card", () => {
+    render(<HomeScreen name="Jadyn" episodes={sampleEpisodes} now={now} />);
+    const card = screen.getByRole("heading", { name: "Hi Jadyn" }).closest('[data-slot="card"]') as HTMLElement;
+    expect(card).toContainElement(screen.getByRole("button", { name: "Sign out" }));
   });
 
   test("shows a migraine totals card (last 30 days by default)", () => {

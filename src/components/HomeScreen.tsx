@@ -8,7 +8,8 @@ import {
 } from "@/lib/episodes";
 import { METRIC_SEGMENTS, migraineMetricData } from "@/lib/migraine-metrics";
 import { EpisodeCard } from "./EpisodeCard";
-import { Card, CardDescription, CardHeader, CardTitle } from "./ui/card";
+import { SignOutButton } from "./SignOutButton";
+import { Card, CardAction, CardDescription, CardHeader, CardTitle } from "./ui/card";
 import MetricCard from "./kokonutui/metric-card";
 import { LoggedCheck } from "./LoggedCheck";
 import { LogButton } from "./LogButton";
@@ -38,6 +39,9 @@ export function HomeScreen({ name, episodes, now, onLog, confirmation }: Props) 
       <Card className="mt-4 rounded-2xl border border-dusk-fill bg-dusk-surface ring-0">
         <CardHeader className="gap-1.5">
           <CardDescription className="text-sm text-dusk-muted">{today}</CardDescription>
+          <CardAction>
+            <SignOutButton />
+          </CardAction>
           <CardTitle>
             <h1 className="text-[22px] font-semibold leading-tight text-dusk-text">Hi {name}</h1>
           </CardTitle>
